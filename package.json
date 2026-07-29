@@ -1,0 +1,11 @@
+{
+  "name": "vampirecoder-skills",
+  "version": "0.0.0-alpha",
+  "private": true,
+  "description": "Vampire Coder's agent skills for real engineering",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/im-vampirecoder/skills"
+  }
+}
