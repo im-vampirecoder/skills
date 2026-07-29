@@ -2,7 +2,11 @@
 
 Personal [Claude Code Agent Skills](https://code.claude.com/docs/en/skills) - the workflows and disciplines I actually use, packaged so they're reusable across projects instead of copy-pasted between them.
 
-This repo starts empty on purpose. Skills get added one at a time, each one earned by a real, repeated need - not ported wholesale from someone else's set.
+Skills get added one at a time, each one earned by a real, repeated need - not ported wholesale from someone else's set.
+
+## Skills
+
+- **[dotnet](./skills/dotnet/README.md)** - .NET/C# tooling
 
 ## Structure
 

@@ -15,7 +15,7 @@ There is no build, lint, or test step - skills are Markdown files with YAML fron
 
 This is a Claude Code [Agent Skills](https://code.claude.com/docs/en/skills) repository: a flat collection of `skills/<bucket>/<skill-name>/SKILL.md` files, each one an independent, self-contained unit Claude Code can discover, invoke, or auto-trigger.
 
-**Bucket layout.** Skills are grouped under `skills/` by bucket (`engineering/`, `productivity/`, `in-progress/`, `misc/`, `deprecated/` - see `skills/README.md`). Buckets exist for human navigation only; nothing in tooling treats one bucket differently from another yet. Each bucket folder should carry its own `README.md` listing its skills, one line each, split into User-invoked / Model-invoked.
+**Bucket layout.** Skills are grouped under `skills/` by bucket - general-purpose (`engineering/`, `productivity/`) or tech-specific (`dotnet/`), see `skills/README.md` for the current list and when to add a new one. Buckets exist for human navigation only; nothing in tooling treats one bucket differently from another yet. Each bucket folder should carry its own `README.md` listing its skills, one line each, split into User-invoked / Model-invoked.
 
 **`SKILL.md` frontmatter contract:**
 
