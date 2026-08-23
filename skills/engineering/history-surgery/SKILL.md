@@ -34,16 +34,20 @@ Rewrites a branch's commit history so that changes the user identifies - uncommi
 
 8. **Create the working branch.** `git switch -c rewrite-<target>-in-progress <target>`. Since the new branch starts at the same tip as `<target>`, any uncommitted files carry over untouched - do not stash them; any named source commits are still present on this branch too, to be dropped in step 10. Before making any commits, confirm the author/committer identity to use: read `git config user.name` / `user.email` and ask the user to confirm it's correct.
 
-9. **Rewrite the farthest commit.** Isolate just that commit's content: check out its parent, then `git cherry-pick <farthest-hash> --no-commit` to stage only that commit's own diff. Layer the relevant hunks of the source diff (step 3) on top and show the user the combined result - this step is manual and judgment-heavy, don't auto-merge blindly. Confirm a commit message (one line, under 100 characters) with the user, then commit preserving the original author and date:
-   ```
-   GIT_AUTHOR_DATE="<original author date>" GIT_COMMITTER_DATE="<original author date>" \
-     git commit --author="<original author>" --date="<original author date>" -m "<confirmed message>"
-   ```
+9. **Rewrite the farthest commit.** Isolate just that commit's content: check out its parent, then `git cherry-pick <farthest-hash> --no-commit` to stage only that commit's own diff. Layer the relevant hunks of the source diff (step 3) on top and show the user the combined result - this step is manual and judgment-heavy, don't auto-merge blindly. Confirm a commit message (one line, under 100 characters) with the user. Pull the original commit's author identity and date directly from git - never retype or guess a date string - then commit with it as both author date and committer date:
+    ```
+    AUTHOR_IDENT=$(git show -s --format='%an <%ae>' <farthest-hash>)
+    AUTHOR_DATE=$(git show -s --format=%ad --date=iso-strict <farthest-hash>)
+    GIT_AUTHOR_DATE="$AUTHOR_DATE" GIT_COMMITTER_DATE="$AUTHOR_DATE" \
+      git commit --author="$AUTHOR_IDENT" --date="$AUTHOR_DATE" -m "<confirmed message>"
+    ```
+    Verify immediately with `git log -1 --format='author=%ai committer=%ci'` - both dates must equal `$AUTHOR_DATE`. Fix before moving on if they don't; a mismatch here defeats the entire point of the skill.
 
 10. **Cherry-pick forward.** For each subsequent original commit, oldest to newest, from `<farthest-hash>` up to the target's original tip:
     - If the commit is one of the source commits named in step 2, **skip it** - its content was already folded into the rewritten commit in step 9, so replaying it would duplicate the diff.
-    - Otherwise: `GIT_COMMITTER_DATE="<original committer date>" git cherry-pick -x <hash>`, then drop the auto-added `(cherry picked from ...)` trailer if the history should read clean. A commit with no overlap picks cleanly. A commit that touches content already altered by the rewrite needs conflict handling - see `references/conflict-resolution.md`.
-    - After each commit lands or is skipped, report progress: how many commits processed so far and how many remain to the original tip.
+    - Otherwise: `git cherry-pick -x --committer-date-is-author-date <hash>`. The `--committer-date-is-author-date` flag is required, not optional - plain `git cherry-pick` preserves the author date but stamps the committer date as the moment the cherry-pick runs, which is exactly the mismatch this skill exists to prevent. Then drop the auto-added `(cherry picked from ...)` trailer if the history should read clean. A commit with no overlap picks cleanly. A commit that touches content already altered by the rewrite needs conflict handling - see `references/conflict-resolution.md`.
+    - After each commit lands or is skipped, verify with `git log -1 --format='author=%ai committer=%ci'` that both dates match. Stop and investigate before continuing if they don't - don't let a mismatch propagate through the rest of the rewrite.
+    - Report progress: how many commits processed so far and how many remain to the original tip.
 
 11. **Verify before touching the target branch.** Once `rewrite-<target>-in-progress` reaches the original tip's content (minus the dropped source commits), ask the user to verify the result - build, test, whatever the project's own verification commands are - before anything is force-pushed.
 
@@ -63,3 +67,7 @@ Rewrites a branch's commit history so that changes the user identifies - uncommi
   ```
   If the source was purely named commits with no uncommitted changes, there's nothing to reapply - `<target>` already has everything. Because `<target>` was never touched, this fully restores the pre-invocation state - the `backup/*` branch from step 7 is a second safety net, not the primary way back.
 - Don't skip a confirmation step because earlier steps were already confirmed - each one gates a different, harder-to-reverse action.
+
+## Common mistakes
+
+- **Committer date silently defaults to "now."** Plain `git cherry-pick` and plain `git commit` only preserve the *author* date automatically - the committer date is stamped at run time unless told otherwise. Always use `--committer-date-is-author-date` (step 10) or an explicit `GIT_COMMITTER_DATE` pulled from `git show` (step 9), and verify with `git log -1 --format='author=%ai committer=%ci'` after every commit. A skill whose entire purpose is preserving original dates that quietly stamps today's date is a failed run, not a cosmetic issue.
