@@ -10,6 +10,11 @@ Rewrites a branch's commit history so that changes the user identifies - uncommi
 
 **This is destructive and ends in a force-push.** Never proceed past step 7 (the backup) without the user's explicit go-ahead, and ask again before the force-push in step 12 even if everything earlier was already confirmed.
 
+**Every resulting commit must look like it was made properly at the time, not like history was manipulated afterward.** Two invariants enforce this and apply to every commit the rewrite produces, no exceptions:
+
+- **Committer date always equals that commit's own author date.** Never let a committer date default to whenever the rewrite happens to run.
+- **No commit message anywhere may reference the rewrite process.** Strip any `(cherry picked from ...)` trailer and any other cherry-pick/rebase/rewrite wording, including wording already present in an original message before this skill ran.
+
 ## Process
 
 1. **Pick the target branch.** Ask which branch to rewrite (default: the current branch). Tell the user this is a destructive rewrite that requires a force-push afterward, and that walking commit-by-commit through history (steps 5, 9, 10) is token-intensive - ask them to make sure they have sufficient token budget available before continuing. Confirm they understand both before proceeding.
@@ -45,8 +50,13 @@ Rewrites a branch's commit history so that changes the user identifies - uncommi
 
 10. **Cherry-pick forward.** For each subsequent original commit, oldest to newest, from `<farthest-hash>` up to the target's original tip:
     - If the commit is one of the source commits named in step 2, **skip it** - its content was already folded into the rewritten commit in step 9, so replaying it would duplicate the diff.
-    - Otherwise: `git cherry-pick -x --committer-date-is-author-date <hash>`. The `--committer-date-is-author-date` flag is required, not optional - plain `git cherry-pick` preserves the author date but stamps the committer date as the moment the cherry-pick runs, which is exactly the mismatch this skill exists to prevent. Then drop the auto-added `(cherry picked from ...)` trailer if the history should read clean. A commit with no overlap picks cleanly. A commit that touches content already altered by the rewrite needs conflict handling - see `references/conflict-resolution.md`.
-    - After each commit lands or is skipped, verify with `git log -1 --format='author=%ai committer=%ci'` that both dates match. Stop and investigate before continuing if they don't - don't let a mismatch propagate through the rest of the rewrite.
+    - Otherwise: `git cherry-pick --committer-date-is-author-date <hash>` - never pass `-x`, since that flag is exactly what stamps the `(cherry picked from ...)` trailer the invariants above forbid. `--committer-date-is-author-date` is required, not optional - plain `git cherry-pick` preserves the author date but stamps the committer date as the moment the cherry-pick runs.
+    - If git reports the pick is now empty ("The previous cherry-pick is now empty"), check whether the *original* commit actually touched files: `git show --stat <hash>`.
+      - If it did, its content was already absorbed by an earlier splice or conflict-merge in this rewrite. Skip it: `git cherry-pick --skip`. Report it as "folded away," distinct from both a clean pick and a step-2 source-commit skip. Never commit it empty - a no-op commit is itself an obvious sign history was rewritten, breaking the "looks naturally made" invariant.
+      - If the original commit was already empty in the source history (rare - e.g. a deliberate `--allow-empty` commit), that emptiness isn't caused by the rewrite, so preserve it rather than dropping it: `git cherry-pick --keep-redundant-commits --committer-date-is-author-date <hash>`.
+    - Even on a clean, non-empty pick, check the resulting message: if the original commit's message already contains cherry-pick/rebase/rewrite wording from some earlier, unrelated history operation, strip it with `git commit --amend -m "<cleaned message>"`. Otherwise leave a clean pick's message untouched - its diff didn't change, so it's already an accurate, naturally-written description.
+    - A commit that touches content already altered by the rewrite needs conflict handling - see `references/conflict-resolution.md`. That path always ends with the message rewritten to match the commit's actual final diff, confirmed with the user, and free of any rewrite-process wording.
+    - After each commit lands or is skipped, verify with `git log -1 --format='author=%ai committer=%ci'` that both dates match, and that the message contains no cherry-pick/rewrite wording. Stop and investigate before continuing if either check fails - don't let a violation propagate through the rest of the rewrite.
     - Report progress: how many commits processed so far and how many remain to the original tip.
 
 11. **Verify before touching the target branch.** Once `rewrite-<target>-in-progress` reaches the original tip's content (minus the dropped source commits), ask the user to verify the result - build, test, whatever the project's own verification commands are - before anything is force-pushed.
@@ -71,3 +81,6 @@ Rewrites a branch's commit history so that changes the user identifies - uncommi
 ## Common mistakes
 
 - **Committer date silently defaults to "now."** Plain `git cherry-pick` and plain `git commit` only preserve the *author* date automatically - the committer date is stamped at run time unless told otherwise. Always use `--committer-date-is-author-date` (step 10) or an explicit `GIT_COMMITTER_DATE` pulled from `git show` (step 9), and verify with `git log -1 --format='author=%ai committer=%ci'` after every commit. A skill whose entire purpose is preserving original dates that quietly stamps today's date is a failed run, not a cosmetic issue.
+- **`-x` leaves a `(cherry picked from ...)` trailer.** Never pass `-x` to `git cherry-pick` in this skill - it's the single most obvious tell that history was rewritten, and it directly contradicts the goal of making every commit look like it happened naturally at the time.
+- **A stale message survives a content change.** When conflict resolution alters a commit's diff (`references/conflict-resolution.md`), leaving its original message in place makes the commit describe content it no longer contains. Rewrite the message to match the actual final diff whenever the diff itself changed.
+- **An empty cherry-pick halts the walk if it's not handled.** Once earlier splices/merges in the rewrite absorb a later commit's content, cherry-picking that commit produces nothing to apply and git stops rather than silently continuing. Check `git show --stat <hash>` on the *original* commit to tell "already folded away" (skip it, don't commit empty) from "was genuinely empty in the source history" (preserve it with `--keep-redundant-commits`) - see step 10.
