@@ -1,7 +1,9 @@
 ---
-name: history-surgery
+name: vc-history-surgery
 description: Rewrites git commit history to fold uncommitted working-directory changes and/or specific existing commits back into the historical commits they belong to, preserving original authorship and dates, with a confirmation gate before every destructive step and before any force-push.
 disable-model-invocation: true
+metadata:
+  internal: true
 ---
 
 # History Surgery

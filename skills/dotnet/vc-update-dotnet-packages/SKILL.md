@@ -1,5 +1,5 @@
 ---
-name: update-packages
+name: vc-update-dotnet-packages
 description: Update outdated NuGet packages in a .NET solution using dotnet-outdated. Use when the user wants to upgrade NuGet packages, check for outdated dependencies, mentions dotnet-outdated, or asks to update package versions in a .NET/C# project.
 ---
 

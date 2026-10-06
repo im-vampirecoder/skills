@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Symlinks every skill in this repo into ~/.claude/skills so Claude Code can
 # discover and load them while you develop. Re-run after adding, removing, or
-# renaming a skill. A git pull keeps linked skills current automatically.
+# renaming a skill or command. A git pull keeps linked skills current automatically.
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 DEST="$HOME/.claude/skills"
@@ -39,3 +39,13 @@ done < <(find "$REPO/skills" -name SKILL.md -not -path '*/deprecated/*' -print0 
 if [ "$found" -eq 0 ]; then
   echo "no skills found under $REPO/skills yet"
 fi
+
+# Slash-command shims: commands/<ns>/<cmd>.md -> ~/.claude/commands/<ns>/<cmd>.md
+for ns_dir in "$REPO"/commands/*/; do
+  ns="$(basename "$ns_dir")"
+  mkdir -p "$HOME/.claude/commands/$ns"
+  for cmd in "$ns_dir"*.md; do
+    ln -sfn "$cmd" "$HOME/.claude/commands/$ns/$(basename "$cmd")"
+    echo "linked /$ns:$(basename "$cmd" .md)"
+  done
+done

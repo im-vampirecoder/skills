@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 scripts/list-skills.sh   # list every SKILL.md in the repo
-scripts/link-skills.sh   # symlink every skill into ~/.claude/skills for local testing
+scripts/link-skills.sh   # symlink every skill into ~/.claude/skills, and every command shim into ~/.claude/commands, for local testing
 ```
 
 There is no build, lint, or test step - skills are Markdown files with YAML frontmatter, not code that compiles or runs standalone.
@@ -33,5 +33,7 @@ disable-model-invocation: true   # omit unless the skill must be user-invoked on
 A user-invoked skill may call out to model-invoked skills; a model-invoked skill should not depend on a user-invoked one, since nothing but a human can reach it.
 
 **Skill internals.** A skill can be a single `SKILL.md`, or `SKILL.md` plus sibling reference files in the same folder for material that's only needed on some runs (progressive disclosure - keep `SKILL.md` itself lean, push detail into a linked file loaded on demand). Reference the existing `superpowers:writing-skills` and `skill-creator:skill-creator` skills (already available in this environment) when authoring or refining a skill - this repo doesn't duplicate that guidance.
+
+**Naming and commands.** Every skill is named `vc-<name>` (folder and `name:` match). Each skill is paired with two thin shims, `commands/vc/<name>.md` and `commands/vampirecoder/<name>.md` (no `vc-` in the file name), that just tell Claude to invoke the matching `vc-<name>` skill with `$ARGUMENTS`. That is what makes `/vc:<name>` and `/vampirecoder:<name>` resolve; the skill's own `/vc-<name>` form works without them. `scripts/link-skills.sh` symlinks the shims into `~/.claude/commands/`. The `npx skills` installer copies skills only, not `commands/`, so installs from it get `/vc-<name>` only.
 
 **Packaging.** `package.json` carries the repo version (starts at `0.0.0-alpha`), bumped manually for now - no changesets or release automation yet. Publishing model is `npx skills@latest add im-vampirecoder/skills` only - no Claude Code plugin channel, so there's no `.claude-plugin/plugin.json` or `marketplace.json`. That installer just walks the repo for `SKILL.md` files and doesn't read `package.json` at all, so it's already installable the moment a `SKILL.md` exists.
