@@ -7,6 +7,7 @@ Skills get added one at a time, each one earned by a real, repeated need - not p
 ## Skills
 
 - **[dotnet](./skills/dotnet/README.md)** - .NET/C# tooling
+- **[ios](./skills/ios/README.md)** - iOS / App Store Connect release and app management
 
 ## Structure
 

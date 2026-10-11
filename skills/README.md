@@ -19,6 +19,7 @@ Current buckets:
 
 - **[dotnet](./dotnet/README.md)** - .NET/C# tooling
 - **[engineering](./engineering/README.md)** - daily code work (debugging, review, TDD, architecture)
+- **[ios](./ios/README.md)** - iOS / App Store Connect release and app management
 
 Each bucket folder should have its own `README.md` listing the skills in it
 with a one-line description, split into **User-invoked** and **Model-invoked**

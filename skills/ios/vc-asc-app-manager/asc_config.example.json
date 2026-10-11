@@ -1,0 +1,8 @@
+{
+  "key_id": "ABC123DEFG",
+  "issuer_id": "69a6de70-0000-0000-0000-000000000000",
+  "private_key_path": "./AuthKey_ABC123DEFG.p8",
+  "_comment_old_new": "old_app_id/new_app_id are only used by the clone/migrate scripts as defaults for --app-id. For direct single-app edits (list_apps.py, get_app_info.py, set_app_info.py) pass --app-id explicitly instead and omit these two.",
+  "old_app_id": "1234567890",
+  "new_app_id": "0987654321"
+}
