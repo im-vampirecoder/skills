@@ -118,7 +118,7 @@ currently open for edits (not `READY_FOR_SALE`).
 ## Things this skill does NOT automate
 - App Store promotion ordering (promoted in-app purchases list)
 - Screenshots, app previews (no write endpoint via this skill)
-- Introductory offers, promotional offers (offer codes: see create_offer_code.py)
+- Introductory offers, promotional offers (offer codes: see the vc-asc-offer-codes skill)
 - App Privacy details, age rating, App Store availability/territory list
 - TestFlight groups/testers, Game Center, other capabilities
 - App Store Server Notifications V2 endpoint URL (must be manually pointed

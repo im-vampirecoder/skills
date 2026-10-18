@@ -80,29 +80,11 @@ from App Information above, even though both are per-locale.
    version (Apple doesn't expose the field until v1.0.1+) — don't pass
    it for a brand new app's first submission.
 
-## Subscription offer codes (promo links / QR)
+## Subscription offer codes
 
-Free-trial offer code + shared custom code, redeemable at
-`https://apps.apple.com/redeem?ctx=offercodes&id=APPID&code=CODE` (works as a
-QR: scan -> redeem sheet -> install app if missing).
-
-1. **Create** — `scripts/create_offer_code.py --product-id PRODUCT_ID --name
-   "Reference name" --custom-code CODE [--duration THREE_MONTHS]
-   [--eligibility NEW] [--offer-eligibility REPLACE_INTRO_OFFERS]
-   [--limit 10000] [--expires YYYY-MM-DD] [--sandbox-test-codes N]
-   [--qr-out promo.png] [--dry-run]`. Resolves the subscription's
-   territories and adds a free-trial price entry per territory. Idempotent
-   on `--name`. Always `--dry-run` first — a live offer cannot be deleted,
-   only deactivated.
-2. **List / switch off** — `scripts/toggle_offer_code.py --list`, then
-   `--deactivate-custom-code ID` (stop new redemptions) or
-   `--deactivate-offer ID` (whole offer). Treat deactivation as permanent.
-3. **TestFlight testing** — `--sandbox-test-codes N` creates SANDBOX
-   one-time codes; fetch them with `toggle_offer_code.py --sandbox-values
-   BATCH_ID` (generated async, retry if not ready). Custom codes are
-   production-only.
-4. QR PNG needs the optional `qrcode` package
-   (`$HOME/.claude/skills/.venv/bin/pip install 'qrcode[pil]'`).
+Offer codes (promo links, QR codes, one-time and TestFlight sandbox codes) live
+in the sibling `vc-asc-offer-codes` skill, which reuses this skill's
+`asc_auth.py`.
 
 ## Clone/migrate app data to a different app record
 
