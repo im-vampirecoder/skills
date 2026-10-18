@@ -1,0 +1,62 @@
+{
+  "skill_name": "vc-create-sprint-release-note",
+  "evals": [
+    {
+      "id": 0,
+      "name": "latest-sprint-both-formats",
+      "prompt": "Generate the audience-facing release note for the most recently completed sprint. I want both the wiki markdown draft and an email-ready HTML file. Mark the wiki version as Draft. For the wiki location, if it isn't already configured, use the default /<project>/Product/Sprint Releases/Release Note - {sprint_name}, wiki <project>.wiki, team '<project> Team' -- save that as the config. Do NOT actually call the publish script or run any `az devops wiki page create/update` command -- just produce the final draft files and show me, I'll publish it myself later.",
+      "expected_output": "A markdown wiki draft for the most recently completed sprint (org/project from .vc/config.toml), grouped by feature/epic in plain non-technical language, with a Draft indicator at the top and (#id) references, plus a separate simplified/inline-styled HTML email file with the same content but no (#id) references. No actual wiki publish call made.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "wiki_draft.md has a visible Draft indicator near the top"
+        },
+        {
+          "text": "wiki_draft.md is grouped under plain-language feature/epic headings, not New features/Changes/Bug fixes/Enhancements"
+        },
+        {
+          "text": "wiki_draft.md contains (#<id>) references"
+        },
+        {
+          "text": "both files correctly resolve to the most recently completed sprint"
+        },
+        {
+          "text": "email_draft.html contains no (#<id>) references"
+        },
+        {
+          "text": "email_draft.html uses only inline styles, no <style> block or external CSS/script"
+        },
+        {
+          "text": "neither file leaks internal jargon (NFR, HITL, spike, PBI, 'User Story', 'Task')"
+        },
+        {
+          "text": "no wiki page was actually created or updated (run stayed read-only)"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "sprint25-email-only",
+      "prompt": "Our support lead isn't technical at all -- can you put together a plain-English summary of what shipped in Sprint 25, just as something I can paste into an email? I don't need the wiki version this time.",
+      "expected_output": "A simplified/inline-styled HTML file for Sprint 25 only, grouped by feature/epic, written in plain non-technical language with no work-item IDs, no wiki file produced since it wasn't requested.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "email_draft.html produced and correctly scoped to Sprint 25"
+        },
+        {
+          "text": "no (#<id>) references"
+        },
+        {
+          "text": "uses only inline styles, no <style> block or external CSS/script"
+        },
+        {
+          "text": "no internal jargon (NFR, HITL, spike, PBI, 'User Story', 'Task')"
+        },
+        {
+          "text": "content organized around more than one feature, not a flat undifferentiated list"
+        }
+      ]
+    }
+  ]
+}

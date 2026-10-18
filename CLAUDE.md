@@ -6,10 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 scripts/list-skills.sh   # list every SKILL.md in the repo
-scripts/link-skills.sh   # symlink every skill into ~/.claude/skills, and every command shim into ~/.claude/commands, for local testing
+scripts/link-skills.sh   # symlink every skill into ~/.claude/skills, every command shim into ~/.claude/commands, and every agent into ~/.claude/agents, for local testing
+python3 -m unittest discover -s tests -p "test_*.py"   # tests for skill scripts, against tests/fixtures/
 ```
 
-There is no build, lint, or test step - skills are Markdown files with YAML frontmatter, not code that compiles or runs standalone.
+There is no build or lint step - skills are Markdown files with YAML frontmatter, not code that compiles or runs standalone. Only skill `scripts/` have tests, under `tests/` at the repo root (Python 3 stdlib `unittest`, one `test_<area>_scripts.py` per skill or skill group, fixture repos under `tests/fixtures/`). A test imports its scripts by path (`skills/<bucket>/<skill>/scripts`), so moving or renaming a skill means updating that path. Add or update a test whenever a skill's `scripts/` changes.
 
 ## Architecture
 
@@ -36,4 +37,6 @@ A user-invoked skill may call out to model-invoked skills; a model-invoked skill
 
 **Naming and commands.** Every skill is named `vc-<name>` (folder and `name:` match). Each skill is paired with two thin shims, `commands/vc/<name>.md` and `commands/vampirecoder/<name>.md` (no `vc-` in the file name), that just tell Claude to invoke the matching `vc-<name>` skill with `$ARGUMENTS`. That is what makes `/vc:<name>` and `/vampirecoder:<name>` resolve; the skill's own `/vc-<name>` form works without them. `scripts/link-skills.sh` symlinks the shims into `~/.claude/commands/`. The `npx skills` installer copies skills only, not `commands/`, so installs from it get `/vc-<name>` only.
 
-**Packaging.** `package.json` carries the repo version (starts at `0.0.0-alpha`), bumped manually for now - no changesets or release automation yet. Publishing model is `npx skills@latest add im-vampirecoder/skills` only - no Claude Code plugin channel, so there's no `.claude-plugin/plugin.json` or `marketplace.json`. That installer just walks the repo for `SKILL.md` files and doesn't read `package.json` at all, so it's already installable the moment a `SKILL.md` exists.
+**Agents.** A subagent a skill spawns (a pinned cheaper model, real parallelism, or output that should stay out of the calling skill's context) lives at the repo root as `agents/vc-<name>.md`, never inside a skill folder. Give it a narrow `description` so nothing outside its calling skill reaches for it, and pin `model:` deliberately. `scripts/link-skills.sh` symlinks `agents/` into `~/.claude/agents/`; the `npx skills` installer does not copy `agents/`, so skills that spawn one (the `delivery/` set) need it installed separately.
+
+**Packaging.** `package.json` carries the repo version (started at `0.0.0-alpha`), bumped manually for now - no changesets or release automation yet. Publishing model is `npx skills@latest add im-vampirecoder/skills` only - no Claude Code plugin channel, so there's no `.claude-plugin/plugin.json` or `marketplace.json`. That installer just walks the repo for `SKILL.md` files and doesn't read `package.json` at all, so it's already installable the moment a `SKILL.md` exists.

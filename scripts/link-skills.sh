@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Symlinks every skill in this repo into ~/.claude/skills so Claude Code can
+# Symlinks every skill, command shim, and agent in this repo into ~/.claude so Claude Code can
 # discover and load them while you develop. Re-run after adding, removing, or
-# renaming a skill or command. A git pull keeps linked skills current automatically.
+# renaming a skill, command, or agent. A git pull keeps linked skills current automatically.
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 DEST="$HOME/.claude/skills"
@@ -49,3 +49,12 @@ for ns_dir in "$REPO"/commands/*/; do
     echo "linked /$ns:$(basename "$cmd" .md)"
   done
 done
+
+# Subagents some skills spawn: agents/<name>.md -> ~/.claude/agents/<name>.md
+if [ -d "$REPO/agents" ]; then
+  mkdir -p "$HOME/.claude/agents"
+  for agent in "$REPO"/agents/*.md; do
+    ln -sfn "$agent" "$HOME/.claude/agents/$(basename "$agent")"
+    echo "linked agent $(basename "$agent" .md)"
+  done
+fi

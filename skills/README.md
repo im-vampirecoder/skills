@@ -17,6 +17,7 @@ rather than a general discipline - e.g. `dotnet/` for .NET/C# tooling.
 
 Current buckets:
 
+- **[delivery](./delivery/README.md)** - PRD-to-shipped backlog and delivery pipeline (PO/PM, architect, developer, QA), local files or Azure DevOps
 - **[dotnet](./dotnet/README.md)** - .NET/C# tooling
 - **[engineering](./engineering/README.md)** - daily code work (debugging, review, TDD, architecture)
 - **[ios](./ios/README.md)** - iOS / App Store Connect release and app management

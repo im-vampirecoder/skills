@@ -1,0 +1,116 @@
+/* Core SVG styles: shared by the reader fragment and standalone SVG.
+   Colour comes from --vc-* palette variables and --vc-role-* family tokens. */
+
+.vc-diagram-svg { font-family: var(--vc-font-sans); display: block; }
+.vc-diagram-svg text { user-select: none; }
+
+.vc-canvas { fill: var(--vc-bg); }
+.vc-grid-dot { fill: var(--vc-text-muted); opacity: 0.28; }
+
+.vc-title { font-size: 16px; font-weight: 700; fill: var(--vc-text-primary); letter-spacing: -0.01em; }
+.vc-subtitle { font-size: 11px; font-weight: 500; fill: var(--vc-text-secondary); }
+
+/* Frames: boundaries, lanes, stages */
+.vc-frame { fill: var(--vc-surface); stroke: var(--vc-surface-border); stroke-width: 1; }
+.vc-frame-boundary { fill: transparent; stroke-dasharray: 6 4; stroke-width: 1.5; }
+.vc-frame-stage { stroke-dasharray: 4 3; }
+.vc-frame-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; fill: var(--vc-text-secondary); }
+.vc-frame-role { font-size: 10px; fill: var(--vc-text-muted); }
+
+/* Nodes */
+.vc-node { cursor: pointer; }
+.vc-node-mask { fill: var(--vc-node-bg); }
+.vc-node-card { fill: var(--vc-node-fill, var(--vc-node-bg)); stroke: var(--vc-node-stroke, var(--vc-node-border)); stroke-width: 1.5; transition: stroke-width 160ms ease; }
+.vc-node[data-shape="notch"] .vc-node-card { stroke-width: 2; }
+.vc-node-accent { fill: var(--vc-node-stroke, var(--vc-accent)); }
+.vc-sigil path { fill: none; stroke: var(--vc-node-stroke, var(--vc-accent)); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.vc-node-label { font-size: 13px; font-weight: 600; fill: var(--vc-text-primary); }
+.vc-node-sub { font-size: 9.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; fill: var(--vc-text-muted); }
+.vc-node:hover .vc-node-card, .vc-node:focus-visible .vc-node-card { stroke-width: 2.5; }
+.vc-node:focus-visible { outline: none; }
+
+/* Edges */
+.vc-edge-path { fill: none; stroke: var(--vc-edge-stroke); stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; transition: stroke 160ms ease, stroke-width 160ms ease; }
+.vc-edge-dashed { stroke-dasharray: 5 4; }
+.vc-edge[data-tone="failure"] .vc-edge-path { stroke: var(--vc-role-failure-stroke); }
+.vc-edge[data-tone="decision"] .vc-edge-path { stroke: var(--vc-role-decision-stroke); }
+.vc-edge-flow { fill: none; stroke: var(--vc-edge-active); stroke-width: 2.25; stroke-linecap: round; opacity: 0; pointer-events: none; }
+.vc-edge-label-mask { fill: var(--vc-bg); stroke: var(--vc-surface-border); stroke-width: 1; }
+.vc-edge-label text { font-size: 10.5px; font-weight: 500; fill: var(--vc-text-secondary); }
+.vc-arrowhead { fill: var(--vc-edge-stroke); }
+.vc-arrowhead-open { fill: none; stroke: var(--vc-edge-stroke); stroke-width: 1.25; }
+
+/* Sequence extras */
+.vc-lifeline { stroke: var(--vc-edge-stroke); stroke-width: 1.25; stroke-dasharray: 4 4; opacity: 0.55; }
+.vc-activation { fill: var(--vc-accent-light); stroke: var(--vc-accent); stroke-width: 1; }
+
+/* Legend */
+.vc-legend-swatch { stroke-width: 1.5; }
+.vc-legend-item text { font-size: 10.5px; font-weight: 500; fill: var(--vc-text-secondary); }
+
+/* Motion: staggered entrance, edge draw, optional finite trace pass.
+   Total budget stays under 8 s because --step is capped at 40 by the compiler. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-motion="play"] [data-animate="node"] {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: vc-node-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(var(--step, 0) * 110ms);
+  }
+  [data-motion="play"] [data-animate="edge"] .vc-edge-path {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: vc-edge-draw 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation-delay: calc(var(--step, 0) * 110ms + 140ms);
+  }
+  [data-motion="play"] [data-animate="edge"] .vc-edge-dashed {
+    animation-name: vc-edge-draw-dashed;
+  }
+  [data-motion="play"] [data-animate="edge"] .vc-edge-label {
+    opacity: 0;
+    animation: vc-fade-in 0.4s ease forwards;
+    animation-delay: calc(var(--step, 0) * 110ms + 520ms);
+  }
+  [data-motion="play"] [data-animate="frame"] {
+    opacity: 0;
+    animation: vc-fade-in 0.5s ease forwards;
+  }
+  [data-motion="play"][data-animation="trace"] [data-animate="edge"] .vc-edge-flow,
+  [data-motion="play"] [data-animation="trace"] [data-animate="edge"] .vc-edge-flow {
+    stroke-dasharray: 5 9;
+    animation: vc-edge-flow 1.3s linear 3;
+    animation-delay: calc(var(--step, 0) * 110ms + 900ms);
+  }
+  [data-motion="play"][data-animation="trace"] [data-animate="node"] .vc-node-card,
+  [data-motion="play"] [data-animation="trace"] [data-animate="node"] .vc-node-card {
+    animation: vc-node-pulse 1.6s ease-in-out 1;
+    animation-delay: calc(var(--step, 0) * 110ms + 900ms);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vc-diagram-svg *, .vc-diagram-svg { animation: none !important; transition: none !important; }
+}
+
+@keyframes vc-node-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes vc-edge-draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes vc-edge-draw-dashed {
+  to { stroke-dashoffset: 0; stroke-dasharray: 5 4; }
+}
+@keyframes vc-fade-in {
+  to { opacity: 1; }
+}
+@keyframes vc-edge-flow {
+  0% { stroke-dashoffset: 28; opacity: 0; }
+  15% { opacity: 0.9; }
+  85% { opacity: 0.9; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes vc-node-pulse {
+  0%, 100% { stroke-width: 1.5; }
+  50% { stroke-width: 3; }
+}

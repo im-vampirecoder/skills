@@ -6,6 +6,7 @@ Skills get added one at a time, each one earned by a real, repeated need - not p
 
 ## Skills
 
+- **[delivery](./skills/delivery/README.md)** - PRD-to-shipped backlog and delivery pipeline: PRDs, user stories, tracker sync, task breakdown, implementation, review, test cases
 - **[dotnet](./skills/dotnet/README.md)** - .NET/C# tooling
 - **[ios](./skills/ios/README.md)** - iOS / App Store Connect release and app management
 
@@ -17,7 +18,8 @@ See [`skills/README.md`](./skills/README.md) for how skills are organized into b
 
 ```bash
 scripts/list-skills.sh   # list every SKILL.md in the repo
-scripts/link-skills.sh   # symlink every skill into ~/.claude/skills for local testing
+scripts/link-skills.sh   # symlink every skill, command shim, and agent into ~/.claude for local testing
+python3 -m unittest discover -s tests -p "test_*.py"   # run the skill script tests
 ```
 
 Re-run `link-skills.sh` after adding, removing, or renaming a skill.

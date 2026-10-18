@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="orders.empty_cart" xml:space="preserve">
+    <value>Your cart is empty. Add at least one item to place an order.</value>
+  </data>
+  <data name="orders.too_many_items" xml:space="preserve">
+    <value>An order can hold at most 20 items.</value>
+  </data>
+  <data name="orders.cannot_cancel" xml:space="preserve">
+    <value>This order can no longer be cancelled.</value>
+  </data>
+</root>

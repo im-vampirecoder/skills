@@ -1,0 +1,6 @@
+tracker = "local"
+submodule_root = "src"
+
+[repos]
+source = "github"
+cloned = ["shop-api", "shop-app"]

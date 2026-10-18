@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Preview</title>
+<!--
+  vc local canvas overview. Copied to docs/design-system/<app>/canvas/index.html
+  and opened through canvas/local/serve.mjs. Lays out every board from
+  project/canvas.json at its canvas position, live and clickable.
+-->
+<style>
+:root{--bg:#eef0f3;--panel:#ffffff;--ink:#1f2328;--muted:#5f6670;--line:#d5d9df;--accent:#2457c5}
+@media (prefers-color-scheme: dark){:root{--bg:#16181c;--panel:#202329;--ink:#e8eaed;--muted:#a1a7b0;--line:#363a42;--accent:#8ab0ff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+header h1{margin:0;font-size:16px;font-weight:600}
+nav{display:flex;flex-wrap:wrap;gap:4px}
+nav button{font:inherit;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--ink);cursor:pointer}
+nav button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
+label{display:flex;gap:8px;align-items:center;color:var(--muted);margin-left:auto}
+#stage{position:relative;overflow:auto;height:calc(100vh - 56px)}
+#world{position:relative;transform-origin:0 0}
+.board{position:absolute}
+.board .name{position:absolute;left:0;bottom:100%;padding-bottom:8px;font-size:28px;color:var(--muted);white-space:nowrap}
+.board .name a{color:inherit;text-decoration:none}
+.board .name a:hover{color:var(--accent)}
+.board iframe{width:100%;height:100%;border:0;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.12);border-radius:4px}
+.note{position:absolute;font-weight:700;font-size:72px;line-height:1.1;white-space:nowrap;overflow:hidden}
+.sticky{position:absolute;padding:16px;background:#fff6c7;color:#3b3200;border-radius:4px;font-size:22px;white-space:pre-wrap}
+#msg{padding:32px;max-width:640px}
+code{background:var(--panel);padding:2px 6px;border-radius:4px}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Design Preview</h1>
+  <nav id="pages" aria-label="Canvas pages"></nav>
+  <label>Zoom <input id="zoom" type="range" min="0.05" max="1" step="0.05" value="0.25"></label>
+</header>
+<div id="stage"><div id="world"></div></div>
+<script>
+(function () {
+  var world = document.getElementById('world');
+  var zoom = document.getElementById('zoom');
+  var canvas = null;
+  var page = null;
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text) n.textContent = text;
+    return n;
+  }
+
+  function onPage(item) {
+    var first = canvas.pages && canvas.pages[0] ? canvas.pages[0].id : null;
+    return (item.page || first) === page;
+  }
+
+  function draw() {
+    world.replaceChildren();
+    var maxX = 0, maxY = 0, minX = 0, minY = 0;
+    var boards = canvas.boards || {};
+    var order = canvas.order || Object.keys(boards);
+    order.forEach(function (path) {
+      var b = boards[path];
+      if (!b || !onPage(b)) return;
+      minX = Math.min(minX, b.x); minY = Math.min(minY, b.y - 300);
+      maxX = Math.max(maxX, b.x + b.w); maxY = Math.max(maxY, b.y + b.h);
+    });
+    var shiftX = -minX + 80, shiftY = -minY + 80;
+
+    order.forEach(function (path) {
+      var b = boards[path];
+      if (!b || !onPage(b)) return;
+      var box = el('div', 'board');
+      box.style.cssText = 'left:' + (b.x + shiftX) + 'px;top:' + (b.y + shiftY) + 'px;width:' + b.w + 'px;height:' + b.h + 'px';
+      var name = el('div', 'name');
+      var link = el('a', null, (b.title || path) + (b.is_interactive ? '  ▶' : ''));
+      link.href = 'project/' + path;
+      link.target = '_blank';
+      name.appendChild(link);
+      var frame = el('iframe');
+      frame.loading = 'lazy';
+      frame.title = b.title || path;
+      frame.src = 'project/' + path;
+      box.appendChild(name);
+      box.appendChild(frame);
+      world.appendChild(box);
+    });
+
+    Object.keys(canvas.notes || {}).forEach(function (id) {
+      var n = canvas.notes[id];
+      if (!onPage(n) || (n.kind && n.kind !== 'title1')) return;
+      var note = el('div', n.kind === 'title1' ? 'note' : 'sticky', n.text);
+      note.style.left = (n.x + shiftX) + 'px';
+      note.style.top = (n.y + shiftY) + 'px';
+      if (n.maxW) note.style.maxWidth = n.maxW + 'px';
+      if (!n.kind && n.w) note.style.width = n.w + 'px';
+      world.appendChild(note);
+    });
+
+    world.style.width = (maxX + shiftX + 80) + 'px';
+    world.style.height = (maxY + shiftY + 80) + 'px';
+    applyZoom();
+  }
+
+  function applyZoom() {
+    world.style.transform = 'scale(' + zoom.value + ')';
+  }
+
+  function drawPages() {
+    var nav = document.getElementById('pages');
+    nav.replaceChildren();
+    (canvas.pages || []).forEach(function (p) {
+      var btn = el('button', null, p.name);
+      btn.type = 'button';
+      btn.setAttribute('aria-pressed', String(p.id === page));
+      btn.addEventListener('click', function () { page = p.id; drawPages(); draw(); });
+      nav.appendChild(btn);
+    });
+  }
+
+  zoom.addEventListener('input', applyZoom);
+
+  fetch('project/canvas.json', { cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (data) {
+      canvas = data;
+      document.getElementById('title').textContent = data.title || 'Design Preview';
+      document.title = data.title || 'Design Preview';
+      page = data.pages && data.pages[0] ? data.pages[0].id : null;
+      drawPages();
+      draw();
+    })
+    .catch(function () {
+      var msg = el('div');
+      msg.id = 'msg';
+      msg.innerHTML = '<h2>Start the preview server</h2><p>This overview reads <code>project/canvas.json</code>, which a browser blocks for files opened from disk. Run:</p><p><code>node docs/design-system/&lt;app&gt;/canvas/local/serve.mjs</code></p><p>Single boards in <code>project/</code> still open straight from disk.</p>';
+      document.getElementById('stage').replaceChildren(msg);
+    });
+})();
+</script>
+</body>
+</html>

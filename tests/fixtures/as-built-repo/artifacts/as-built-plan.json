@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "submodule_root": "src",
+  "shared_infrastructure": [
+    {"label": "Sign-in guard", "sources": ["src/shop-api/Controllers/OrdersController.cs"]}
+  ],
+  "features": [
+    {
+      "slug": "checkout",
+      "title": "Checkout",
+      "feature_id": "FEATURE-checkout",
+      "sources": [
+        "src/shop-api/Controllers/OrdersController.cs",
+        "src/shop-api/Validators/PlaceOrderValidator.cs",
+        "src/shop-api/Resources/Messages.resx",
+        "src/shop-api/Domain/Order.cs",
+        "src/shop-api/tests/OrdersControllerTests.cs",
+        "src/shop-app/src/screens/CheckoutScreen.tsx"
+      ],
+      "complexity_flags": ["multi-role", "state-machine"],
+      "existing_prd": "artifacts/checkout/prd.md",
+      "grouping_note": "",
+      "status": "done"
+    }
+  ]
+}
