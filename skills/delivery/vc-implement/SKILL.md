@@ -134,8 +134,8 @@ the resume check: `references/progress-file.md`.
   all git operations happen inside the target `src/<repo-name>/`
   checkout(s).
 - Depends on the `vc-implement-worker` agent, shipped in the repo's
-  top-level `agents/vc-implement-worker.md` and linked by
-  `scripts/link-skills.sh` (see
+  top-level `agents/vc-implement-worker.md` and installed with the
+  plugin or the file install (see
   `references/resolve-target-and-worktree.md`) — it's a plain Task-tool
   subagent, spawned only when a run spans more than one repo.
 - The progress file is written only by the orchestrating run — a

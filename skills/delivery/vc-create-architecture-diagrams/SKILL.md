@@ -45,7 +45,8 @@ hold is a gap to report, not one to fill.
      present, `docs/architecture.md` as the starting map.
    - Confirm it against the code for the submodules in scope.
      **One submodule**: read it inline yourself. **2+ submodules**: spawn
-     the `vc-scout` subagent in `focused` mode, one per submodule, in parallel. Brief:
+     the `vc-scout` subagent (`vc:vc-scout` when installed through
+     the plugin) in `focused` mode, one per submodule, in parallel. Brief:
      components and entry points, datastores, outbound calls to other
      submodules or external services, and any status/state fields the
      to-be lifecycle touches — each with `path:line`.

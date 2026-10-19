@@ -71,7 +71,8 @@ runs the one-sentence test explicitly before anything gets written.
      language/framework from its manifest. The folder's own
      `README.md`/`docs/*.md` count as evidence too.
      - **Exactly one project**: scout it inline with `Glob`/`Grep`/`Read`.
-     - **2+ projects**: spawn the `vc-scout` subagent in
+     - **2+ projects**: spawn the `vc-scout` subagent
+       (`vc:vc-scout` when installed through the plugin) in
        `focused` mode once per project, in parallel, with the keywords
        as its brief, and work from its `path:line` findings. Without
        subagent support, scout each project inline, one after another.

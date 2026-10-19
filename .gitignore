@@ -2,3 +2,7 @@
 .worktrees/
 node_modules/
 __pycache__/
+# Links scripts/link-skills.sh makes when pointed at this repo itself
+/.claude/skills/
+/.claude/commands/
+/.claude/agents/

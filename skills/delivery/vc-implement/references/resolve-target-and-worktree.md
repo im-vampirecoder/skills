@@ -24,7 +24,8 @@ user which repo it belongs to rather than guessing.
 
 - **Exactly one repo** → continue with section 3 below inline, scoped to
   every task (or the one bug).
-- **More than one repo** → spawn the `vc-implement-worker` agent:
+- **More than one repo** → spawn the `vc-implement-worker` agent (shown
+  as `vc:vc-implement-worker` when installed through the plugin):
   - Dispatch one worker per repo, in parallel (each owns a disjoint repo
     and disjoint files — safe to run together). Give each worker: the
     repo's path, its slice of the task list (or the bug), the shared

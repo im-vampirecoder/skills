@@ -27,8 +27,8 @@ architecture. Three modes:
   `python3 <skill-dir>/scripts/<script>.py --root .`
 - **Other skills call this one through the Skill tool**
   (`/vc:requirements check`, `view`, `conflicts <feature>`), never by
-  reaching into this folder's script paths, so every install
-  behaves the same.
+  reaching into this folder's script paths, so plugin and file installs
+  behave the same.
 - **ID rules** are defined in `vc-prd`'s
   `references/requirements-section.md`. This skill enforces them; it
   doesn't redefine them.

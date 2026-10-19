@@ -1,7 +1,6 @@
 ---
 name: vc-prompt-enhancer
-description: Expand a quick, rough prompt into a detailed, codebase-grounded one - adds file references, conventions, and a concrete step breakdown - before you send it as a real request. Ported from Augment Code's Ctrl+P Prompt Enhancer.
-disable-model-invocation: true
+description: Expand a quick, rough prompt into a detailed, codebase-grounded one - adds file references, conventions, and a concrete step breakdown - before you send it as a real request. Ported from Augment Code's Ctrl+P Prompt Enhancer. Invoked as /vc:prompt-enhancer [rough prompt].
 ---
 # Prompt Enhancer
 

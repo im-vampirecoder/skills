@@ -1,0 +1,15 @@
+{
+  "name": "vampirecoder-skills",
+  "owner": {
+    "name": "Vampire Coder"
+  },
+  "description": "Vampire Coder's Claude Code plugins",
+  "plugins": [
+    {
+      "name": "vc",
+      "displayName": "Vampire Coder Skills",
+      "source": "./",
+      "description": "Delivery pipeline, .NET, engineering, and iOS skills, commands, and agents"
+    }
+  ]
+}

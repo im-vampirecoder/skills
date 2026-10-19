@@ -1,0 +1,19 @@
+{
+  "name": "vc",
+  "displayName": "Vampire Coder Skills",
+  "version": "0.2.0-alpha",
+  "description": "Vampire Coder's agent skills for real engineering: a PRD-to-shipped delivery pipeline, .NET tooling, git history surgery, session handoff, and App Store Connect release management",
+  "author": {
+    "name": "Vampire Coder"
+  },
+  "repository": "https://github.com/im-vampirecoder/skills",
+  "license": "MIT",
+  "keywords": ["vc", "vampirecoder", "delivery", "dotnet", "ios", "engineering"],
+  "skills": [
+    "./skills/delivery/",
+    "./skills/dotnet/",
+    "./skills/engineering/",
+    "./skills/ios/"
+  ],
+  "commands": "./commands/vc/"
+}

@@ -54,7 +54,8 @@ invented just to fill a template heading.
      `<submodule_root>` to document.
    - **Exactly one submodule**: sweep it inline yourself, following the
      steps below — spawn overhead isn't worth it for one.
-   - **2+ submodules**: spawn the `vc-scout` subagent in `sweep` mode
+   - **2+ submodules**: spawn the `vc-scout` subagent (shown as
+     `vc:vc-scout` when installed through the plugin) in `sweep` mode
      once per submodule, in parallel. Cap concurrency at 5 at a time;
      give each call a 3-minute timeout. A submodule whose sweep times out is skipped and logged in
      the final report as "sweep timed out — re-run to retry" rather than
@@ -323,7 +324,8 @@ After writing or updating `docs/architecture.md` or
   edit the templates, not the prose in this file.
 - One document pair for the whole project, never one per submodule.
 - Depends on the `vc-scout` agent, shipped in the repo's top-level
-  `agents/vc-scout.md` and linked by `scripts/link-skills.sh` — it's a plain Task-tool
+  `agents/vc-scout.md` and installed with the plugin or the file
+  install — it's a plain Task-tool
   subagent, not another skill, shared by every `vc-*` skill that reads
   code. This skill uses its `sweep` mode: pinned to Haiku so fanning it
   out across several submodules stays cheap, and scoped narrowly enough

@@ -94,7 +94,8 @@ edits back into the repo as a git diff.
      - **Flows:** navigation links, menus, redirects, guards, and
        post-action navigation (e.g. "after save → detail page").
    - Small apps: sweep inline. Large apps (roughly 30+ routes or several
-     feature areas): spawn the `vc-ui-scout` agent once per feature area, in parallel, then merge
+     feature areas): spawn the `vc-ui-scout` agent (`vc:vc-ui-scout`
+     through the plugin) once per feature area, in parallel, then merge
      their reports.
    - Show the user a short summary: stack, counts (tokens, components,
      screens), feature areas. With 40+ screens, ask which areas to
@@ -205,8 +206,8 @@ edits back into the repo as a git diff.
 - Complements `vc-docs`: that skill documents architecture; this one
   documents the UI. If `docs/architecture.md` exists, read it for the
   frontend's structure before scanning.
-- Depends on the `vc-ui-scout` agent (top-level `agents/`), linked into
-  `~/.claude/agents` by `scripts/link-skills.sh`.
+- Depends on the `vc-ui-scout` agent (top-level `agents/`), installed
+  with the plugin or the file install.
 - Publishing, pulling and downloading the real Design runtime need a
   Claude Code session signed in to claude.ai. Team members without one
   still get the repo files and the local preview, on its built-in

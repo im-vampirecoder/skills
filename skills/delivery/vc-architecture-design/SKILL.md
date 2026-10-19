@@ -125,7 +125,8 @@ straight to `/vc:create-user-stories` without running this at all.
    - For each `<submodule_root>/<repo-name>/` submodule the in-scope
      features plausibly touch (from step 2's hints, or ask), find out
      the following. **One submodule**: read it inline yourself.
-     **2+ submodules**: spawn the `vc-scout` subagent in `focused`
+     **2+ submodules**: spawn the `vc-scout` subagent
+     (`vc:vc-scout` when installed through the plugin) in `focused`
      mode, one per submodule, in parallel, with this as its brief:
      what patterns/paradigm are already in use, what user-facing
      journeys or capabilities already exist there that overlap the

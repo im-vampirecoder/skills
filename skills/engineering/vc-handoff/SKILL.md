@@ -2,7 +2,6 @@
 name: vc-handoff
 description: Write a redacted handoff document to .handoff/ so another agent session can continue the current work, then tell the user how to resume it with /vc:resume-handoff. Invoked as /vc:handoff.
 argument-hint: "[what the next session will focus on] [--include-diff]"
-disable-model-invocation: true
 ---
 
 # vc Handoff

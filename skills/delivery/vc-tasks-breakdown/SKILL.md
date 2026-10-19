@@ -84,7 +84,8 @@ whichever tool the team runs next.
 3. **Scout the resolved submodule(s)**
    - **One resolved submodule**: scout it inline yourself with
      `Glob`/`Grep`/`Read` — spawn overhead isn't worth it for one.
-   - **2+ resolved submodules**: spawn the `vc-scout` subagent in `focused`
+   - **2+ resolved submodules**: spawn the `vc-scout` subagent
+     (`vc:vc-scout` when installed through the plugin) in `focused`
      mode once per submodule, in parallel. Its brief is the story's
      action/persona/keywords, each Given/When/Then criterion, and the
      conventions listed below; work from its `path:line` findings,

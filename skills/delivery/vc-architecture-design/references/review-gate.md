@@ -28,7 +28,8 @@ trigger.
 
 ## 2. Reviewers (parallel)
 
-Spawn the `vc-architecture-reviewer` agent once
+Spawn the `vc-architecture-reviewer` agent (shown as
+`vc:vc-architecture-reviewer` when installed through the plugin) once
 per lens, all in the same turn so they run in parallel:
 
 | Lens | Run when |

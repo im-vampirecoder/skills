@@ -19,7 +19,8 @@ the start of a run, ask whether to resume from it or discard it.
 ## 2. Read it fresh
 
 **When the environment supports subagents**, spawn the
-`vc-prd-fresh-reader` subagent. Give it only:
+`vc-prd-fresh-reader` subagent (`vc:vc-prd-fresh-reader` when
+installed through the plugin). Give it only:
 
 - the path to `prd.draft.md`,
 - the path to `artifacts/prd.md`, when it exists,

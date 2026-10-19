@@ -2,7 +2,6 @@
 name: vc-resume-handoff
 description: Load a handoff document written by /vc:handoff, confirm with the user that it is still valid, then continue the work. Invoked as /vc:resume-handoff <handoff-doc-path>.
 argument-hint: "<handoff-doc-path>"
-disable-model-invocation: true
 ---
 
 # vc Resume Handoff

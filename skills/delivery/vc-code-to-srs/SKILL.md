@@ -71,7 +71,8 @@ written). Suggest `refresh <feature>` for stale ones and a plain run for
 
 1. **Map the code**
    - One submodule: sweep it in this session. Two or more: spawn one
-     `vc-scout` subagent per submodule in `sweep` mode, in parallel;
+     `vc-scout` subagent per submodule in `sweep` mode, in parallel
+     (shown as `vc:vc-scout` when installed through the plugin);
      without subagent support, sweep each inline, one after another.
    - Per submodule, note the stack and load the matching recipe file:
      `references/recipes-dotnet.md`, `references/recipes-js-ts.md`,
