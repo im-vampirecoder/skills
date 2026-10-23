@@ -38,8 +38,10 @@ the resume check: `references/progress-file.md`.
      already did that.
    - The same confirmation covers marking the story or bug started
      (`status: in-progress` in its file; on Azure DevOps, a story's work
-     item also moves to `[ado].active_state`, e.g. `Active`). Apply it
-     right after the user confirms. Full rules:
+     item also moves to `[ado].active_state`, e.g. `Active`) and, for the
+     first story of a `ready` feature, the feature too (`status: active`
+     in its `prd.md`; on Azure DevOps, the Feature also moves to
+     `[ado].feature_active_state`). Apply it right after the user confirms. Full rules:
      `references/verification-and-tracker-update.md` section 0.
    - Create the progress file at that same confirmation, then update it
      after every checkpoint in steps 2-9 — never batched to the end.
@@ -94,10 +96,10 @@ the resume check: `references/progress-file.md`.
      file.
    - When the story just closed was the feature's last open one (every
      `stories-*.md` in the feature folder is `done` or `removed`) and the
-     PRD isn't `delivered` yet, offer `/vc:prd deliver <feature>`,
-     which freezes the PRD's requirements. The PO confirms delivery; on
+     PRD isn't `done` yet, offer `/vc:prd done <feature>`,
+     which freezes the PRD's requirements. The PO confirms it; on
      a no, or when the developer isn't the PO, say that the PO can run it
-     later. Never deliver automatically.
+     later. Never mark a feature `done` automatically.
    - Full procedure, including the "done" state resolution and why this
      is a deliberate exception to `vc-sync-to-tracker`'s own "never
      touch State" rule: `references/verification-and-tracker-update.md`.
@@ -146,8 +148,9 @@ the resume check: `references/progress-file.md`.
 - Depends on `/vc:code-review` (step 5) and reads output from
   `vc-tasks-breakdown`/`vc-bug-report`; writes tracker state changes
   (started in step 1, finished in step 5) — a separate concern from
-  `vc-sync-to-tracker`, which touches State only to push `ready`.
+  `vc-sync-to-tracker`, which pushes a story's `ready` and a Feature's
+  State from its PRD `status`.
 - This is vc's developer-pipeline terminal step. Nothing invokes this
   skill automatically, and this skill invokes nothing after itself,
-  except `/vc:prd deliver <feature>` when the PO accepts step 5's
+  except `/vc:prd done <feature>` when the PO accepts step 5's
   offer after the feature's last story closes.

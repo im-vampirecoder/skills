@@ -141,7 +141,7 @@ recommendation:
 
 - change the new requirement to fit;
 - narrow both to the conditions where each applies;
-- the other one is delivered: supersede it (`supersession.md`);
+- the other one is `done`: supersede it (`supersession.md`);
 - the other one is a draft: change or retire it instead (its PRD is
   revised in the same run, with a Decisions entry in both);
 - a duplicate: cite the existing ID and drop the new one;

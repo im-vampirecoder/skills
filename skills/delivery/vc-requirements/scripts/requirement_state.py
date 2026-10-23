@@ -59,10 +59,10 @@ def citations_by_id(project):
 
 
 def pending_supersessions(project):
-    """ID or FEATURE-<slug> -> FEATURE id of a not-yet-delivered feature replacing it."""
+    """ID or FEATURE-<slug> -> FEATURE id of a not-yet-done feature replacing it."""
     out = {}
     for feature in project["features"]:
-        if feature["status"] == "delivered":
+        if feature["status"] == "done":
             continue
         for target in feature["supersedes"]:
             out[target] = f"FEATURE-{feature['slug']}"
@@ -82,8 +82,8 @@ def state_of(feature, definition, pending):
 
 def frozen_reason(feature, definition):
     """Why an ID can no longer change meaning, or None while it is still editable."""
-    if feature["status"] == "delivered":
-        return "feature delivered"
+    if feature["status"] == "done":
+        return "feature done"
     for story in feature["stories"]:
         if story["status"] == "done" and definition["id"] in story["implements"]:
             return f"implemented by done story {story['id'] or story['file']}"

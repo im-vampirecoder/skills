@@ -32,7 +32,7 @@ file. This skill never talks to Azure DevOps — syncing is
      - Requirement behind the expected result (only when a feature was
        named and its `prd.md` has a `## Requirements` section): find the
        live `FR-` / `BR-` / `ERR-` entry the Expected Result relies on and
-       quote it back. If the feature is `status: delivered` and the
+       quote it back. If the feature is `status: done` and the
        requirement's text supports both the expected and the actual
        behaviour (unclear rather than wrong), note it for step 6.
    - **No blackbox answers.** Same rule `vc-prd` uses: a vague, hedged,
@@ -107,7 +107,7 @@ file. This skill never talks to Azure DevOps — syncing is
      section for that distinction.
    - `ado_id`/`last_synced` start `null` — this skill never syncs.
    - `status`/`iteration` are the same sprint-tracking fields stories
-     carry (see `vc-create-user-stories` step 6 for the values). Always
+     carry (see `vc-create-user-stories` step 9 for the values). Always
      `new` / `null` here. Only a `ready` bug can be planned into a sprint
      by `vc-plan-sprint-candidates`; a bug-triage skill will make that
      call later, until then the PO sets `status: ready` by hand.
@@ -121,7 +121,7 @@ file. This skill never talks to Azure DevOps — syncing is
      - "Fix it now (`/vc:implement BUG-<bug-slug>`)"
      - "Done for now"
    - When step 1 found the bug traces to an unclear requirement of a
-     delivered feature, also suggest
+     `done` feature, also suggest
      `/vc:prd clarify <requirement-id>` in the report, so the PO can
      settle what the requirement means (a `> Clarified on` line when the
      built behaviour stays, a superseding feature when it changes) before

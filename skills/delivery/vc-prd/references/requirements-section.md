@@ -16,7 +16,7 @@ epic_id: null
 ado_id: null
 last_synced: null
 status: draft
-delivered: null
+done_on: null
 ---
 
 # Feature PRD: <Title>
@@ -84,11 +84,13 @@ Section rules:
 
 - **Frontmatter.** `epic_id`, `ado_id`, `last_synced` start `null` and are
   never written by this skill afterwards (`vc-propose-epic` and
-  `vc-sync-to-tracker` own them). `delivered` is set only by
-  `deliver`. `supersedes: [...]` is added only when this feature
-  replaces delivered requirements, and `superseded: [...]` is written only
-  by `apply_supersessions.py`. Both are single-line lists and are omitted
-  when empty. See `supersession.md`.
+  `vc-sync-to-tracker` own them). `status` moves
+  `draft → ready → active → done` (who sets each: "Feature states" in
+  `supersession.md`); `done_on` is set only by the `done` mode.
+  `supersedes: [...]` is added only when this feature replaces
+  requirements of `done` features, and `superseded: [...]` is written
+  only by `apply_supersessions.py`. Both are single-line lists and are
+  omitted when empty. See `supersession.md`.
 - **Acceptance Criteria** is the feature's own Definition of Done,
   coarser than any story's criteria. It has no IDs: test cases cite the
   FR, BR or ERR they verify.
@@ -140,7 +142,7 @@ Format: `<TYPE>-<feature-slug>.<name>`, for example
 |---|---|---|
 | Uncited, in a draft feature | edit freely; rename or delete freely | edit freely |
 | Cited (story, test case, mockup, another PRD, tracker tag), not built | edit, keep the ID | new ID; retire the old one |
-| Built (a `done` story implements it) or the feature is delivered | never edit the text; add a `> Clarified on` line instead | new ID (delivered: in a new superseding feature); retire or supersede the old one |
+| Built (a `done` story implements it) or the feature is `done` | never edit the text; add a `> Clarified on` line instead | new ID (`done` feature: in a new superseding feature); retire or supersede the old one |
 
 **Retiring** keeps the original text and adds a marker at the end of the
 line: `Retired. Replaced by <new-id>.`, or just `Retired.` when nothing
@@ -162,7 +164,7 @@ directly under it, and only these two kinds exist:
 ```
 
 The first is written only by `apply_supersessions.py`; the second only by
-`clarify` (see `deliver-mode.md`). Any other text under a requirement
+`clarify` (see `done-mode.md`). Any other text under a requirement
 ends it, so never put sub-bullets or wrapped lines there.
 
 | Type | Line |

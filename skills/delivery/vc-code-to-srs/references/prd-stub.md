@@ -21,5 +21,5 @@ shape with gap notes in every interview-derived section), never
 inventing product-level content from code.
 
 Existing `needs-review` stub: add only the `- As-built spec — ...` line
-to its `## Evidence` (show the diff first). `draft` or `delivered` PRD:
-leave it untouched.
+to its `## Evidence` (show the diff first). `draft`, `ready`, `active` or `done`
+PRD: leave it untouched.

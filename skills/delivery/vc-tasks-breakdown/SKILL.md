@@ -1,11 +1,11 @@
 ---
 name: vc-tasks-breakdown
-description: Turn one confirmed user story into an implementation task breakdown, scoped to the code that already exists. Estimates complexity in Story Points (per task and on the story itself), never hours. A leading `validate` token re-verifies an existing breakdown against the current codebase instead. Built-in only — never delegates to a third-party spec-writing skill.
+description: Turn one `ready` user story into an implementation task breakdown, scoped to the code that already exists. Estimates complexity in Story Points (per task and on the story itself), never hours. A leading `validate` token re-verifies an existing breakdown against the current codebase instead. Built-in only — never delegates to a third-party spec-writing skill.
 ---
 
 # Tasks Breakdown
 
-Read one confirmed user story's business-level artifacts, scout the code it
+Read one `ready` user story's business-level artifacts, scout the code it
 actually touches, and produce an implementation-level task breakdown —
 never the reverse. This is vc's last developer-pipeline step: it does not
 invoke or assume any particular next step (test-first implementation, code
@@ -36,6 +36,19 @@ whichever tool the team runs next.
      `artifacts/epic-<epic-slug>/feature-<feature-slug>/` (assigned). Call
      the folder holding the story's `stories-<n>-*.md` file the **feature
      folder**; every path below is relative to it.
+   - **Readiness gate.** Read the target story's frontmatter `status`
+     (a missing `status` counts as `new`). Only the target story counts;
+     siblings' status doesn't matter.
+     - `ready`, `in-progress` or `done` (the last two when regenerating a
+       breakdown) → continue.
+     - `new` → stop: the story hasn't been agreed yet. Point to
+       `/vc:create-user-stories <feature-slug>` (or `/vc:create-pbi
+       <feature-slug>` for a spike or enabler), which offer to mark it
+       ready.
+     - `removed` → stop and say so.
+     - When step 1 listed a feature's stories to choose from, mark the
+       ones that aren't `ready` in that list.
+     - This skill never sets or clears `ready`.
 
 2. **Gather context**
    - Read the target story's own file and its feature's `prd.md`, plus
@@ -237,17 +250,7 @@ whichever tool the team runs next.
      run already set one.
 
 6. **Post-breakdown handoff**
-   - **Readiness offer first.** When the story's frontmatter `status` is
-     `new` (missing counts as `new`):
-     - `story-<n>-spec.md` has items under `## Open Questions` → don't
-       offer. Say the story can be marked ready once they're answered;
-       `/vc:tasks-breakdown validate` offers it again.
-     - Otherwise ask via `AskUserQuestion` whether the story is ready to
-       be put into a sprint ("Not yet" / "Mark ready"). Mark ready → set
-       `status: ready` in the story file's frontmatter (add the line if
-       missing), nothing else. On an Azure DevOps project, note the board
-       changes only when `/vc:sync-to-tracker` runs.
-   - Then ask via `AskUserQuestion` what to do next — never invoke any of
+   - Ask via `AskUserQuestion` what to do next — never invoke any of
      these automatically. `AskUserQuestion` caps a question at 4 options,
      so offer these three always, in this order, plus a 4th slot:
      - "Validate this breakdown
@@ -291,8 +294,7 @@ and consistency sweep).
   criterion is met.
 - Writes entirely under the story's feature folder (unassigned or
   epic-assigned) — the `tasks/` subfolder (step 5) plus, in the story's own file, the
-  one Story Points line and (only on the user's yes in step 6) its
-  `status: ready` line. Never touches `docs/` — that tree is owned by
+  one Story Points line. It never changes the story's `status`. Never touches `docs/` — that tree is owned by
   `vc-docs`. There is no longer a separate top-level `specs/` tree; see
   `vc-setup migrate` for moving output written under the old layout.
 - `vc-sync-to-tracker` reads a story's task files (when present) to sync

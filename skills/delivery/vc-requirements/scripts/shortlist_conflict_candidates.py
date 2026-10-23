@@ -6,7 +6,7 @@ Pairs live requirements from different features that share a signal: a
 glossary term (aliases count as the term), the same state-transition entity,
 the same Touchpoints entry, the same NFR category, or the same ID name.
 Skips pairs already settled in a `## Decisions` entry naming both IDs.
-Delivered-vs-delivered pairs go to `bug_candidates`, never judged. An
+Done-vs-done pairs go to `bug_candidates`, never judged. An
 unscoped run over the threshold returns per-feature counts with
 `needs_scope: true` instead of pairs. Prints JSON; never writes a file.
 """
@@ -112,8 +112,8 @@ def shortlist(root, feature=None, max_pairs=50):
         pair = {"a": a["def"]["id"], "b": b["def"]["id"], "a_feature": fa["slug"], "b_feature": fb["slug"],
                 "a_status": fa["status"], "b_status": fb["status"], "signals": signal,
                 "a_text": a["def"]["text"], "b_text": b["def"]["text"]}
-        (bugs if fa["status"] == fb["status"] == "delivered" else pairs).append(pair)
-    pairs.sort(key=lambda p: (p["a_status"] == "delivered") + (p["b_status"] == "delivered"))
+        (bugs if fa["status"] == fb["status"] == "done" else pairs).append(pair)
+    pairs.sort(key=lambda p: (p["a_status"] == "done") + (p["b_status"] == "done"))
     result = {"scope": feature, "pairs": pairs, "bug_candidates": bugs, "needs_scope": False}
     if feature is None and len(pairs) > max_pairs:
         per = {}

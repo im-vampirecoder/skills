@@ -181,6 +181,16 @@ def read_stories(prd_path):
     return stories
 
 
+# Legacy feature statuses, read as their current name: `delivered` became
+# `done`, and `synced` (written by sync before v1.11.1) means draft.
+LEGACY_FEATURE_STATUS = {"delivered": "done", "synced": "draft"}
+
+
+def feature_status(meta):
+    status = meta.get("status") or "draft"
+    return LEGACY_FEATURE_STATUS.get(status, status)
+
+
 def load_project(root, drafts=False):
     """One pass over the repo: features, definitions, stories, citations."""
     features = []
@@ -189,7 +199,7 @@ def load_project(root, drafts=False):
         meta = read_frontmatter(text)
         features.append({
             "slug": feature_slug_of(prd), "file": str(prd), "meta": meta,
-            "status": meta.get("status") or "draft",
+            "status": feature_status(meta),
             "supersedes": meta.get("supersedes") or [],
             "definitions": parse_definitions(prd), "stories": read_stories(prd),
             "open_markers": text.count("[NEEDS CLARIFICATION"),

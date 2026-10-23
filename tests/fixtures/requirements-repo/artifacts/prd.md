@@ -5,5 +5,5 @@ A web shop.
 
 ## Features
 - [Checkout](./checkout/prd.md)
-- [Accounts](./epic-identity/feature-accounts/prd.md) (delivered)
+- [Accounts](./epic-identity/feature-accounts/prd.md) (done)
 - [PayPal checkout](./paypal-checkout/prd.md)

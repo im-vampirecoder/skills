@@ -1,4 +1,4 @@
-"""Apply a delivered feature's supersessions to the PRDs it replaces.
+"""Apply a done feature's supersessions to the PRDs it replaces.
 
     python3 apply_supersessions.py --root <tracking-repo> --feature <slug> [--date YYYY-MM-DD] [--dry-run]
 
@@ -77,7 +77,7 @@ def apply_to_prd(path, targets, banner_date, dry_run):
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--root", default=".")
-    parser.add_argument("--feature", required=True, help="the delivered, superseding feature's slug")
+    parser.add_argument("--feature", required=True, help="the done, superseding feature's slug")
     parser.add_argument("--date", default=date.today().isoformat())
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()

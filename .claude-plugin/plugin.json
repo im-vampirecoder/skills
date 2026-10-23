@@ -1,7 +1,7 @@
 {
   "name": "vc",
   "displayName": "Vampire Coder Skills",
-  "version": "0.2.0-alpha",
+  "version": "0.3.0-alpha",
   "description": "Vampire Coder's agent skills for real engineering: a PRD-to-shipped delivery pipeline, .NET tooling, git history surgery, session handoff, and App Store Connect release management",
   "author": {
     "name": "Vampire Coder"

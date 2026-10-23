@@ -29,9 +29,9 @@ the PRD is the user's job, checking it is the skill's.
 - **Never sends anything.** No email, no tracker comment, no wiki page —
   the questionnaire is shown and, optionally, saved; sending it is the
   user's call.
-- **Never edits the PRD.** Gaps go to the PO/BA; updating the PRD
-  afterwards is `vc-prd`'s job. The only story-file edit is the
-  `status: ready` line from step 8.
+- **Never edits the PRD's content.** Gaps go to the PO/BA; updating the
+  PRD afterwards is `vc-prd`'s job. The only edit is the PRD's
+  frontmatter `status: ready` line from step 8.
 
 ## Workflow
 
@@ -128,7 +128,7 @@ the PRD is the user's job, checking it is the skill's.
      it already exists). No → leave it in the console.
 
 7. **Offer the PO/BA questionnaire**
-   - Ask whether to generate one. No → stop here.
+   - Ask whether to generate one. No → step 8.
    - Yes → build it from the ❓, ⚠️, ⛔, and 💭 items only (❌ and ⏭️ are
      the reader's own homework, not the PO's), using
      `references/questionnaire-format.md`: grouped by section, ranked
@@ -145,35 +145,42 @@ the PRD is the user's job, checking it is the skill's.
      `<prd-folder>/clarification-questions.html` (confirm before
      overwriting). Report the path(s) written.
 
-8. **Offer to mark stories ready**
-   - Runs only when the feature already has story files
-     (`<prd-folder>/stories-*.md`). None → skip silently.
-   - **Not offered while a gap blocks the work**: any ⛔ item, or any
-     questionnaire item ranked 🔴 Blocking, still in the log. A story
-     whose `- Implements:` IDs still carry a `[NEEDS CLARIFICATION]`
-     marker in the PRD is left out of the list too (same rule as
-     `vc-plan-sprint-candidates`), with the marker named. Say which
-     ones, and that the stories can be marked ready once the PO/BA has
-     answered and `vc-prd` has updated the PRD.
-   - Otherwise list the feature's stories whose frontmatter `status` is
-     `new` (a missing `status` counts as `new`) and ask via
-     `AskUserQuestion`, multi-select, which are ready to be put into a
-     sprint. Include a "None yet" option.
-   - For each one chosen, set `status: ready` in that story file's
-     frontmatter (add the line if missing) and touch nothing else in it.
-     Report the files changed.
-   - On an Azure DevOps project, tell the user the board is unchanged
-     until `/vc:sync-to-tracker` pushes the new state.
+8. **Offer to mark the feature ready**
+   - `ready` is the gate for `vc-create-user-stories`: stories are
+     written only for a `ready` feature (later `active`, once building
+     starts). Runs only when the PRD's frontmatter
+     `status` is `draft` (or legacy `synced`). Already `ready` → say so
+     and skip. `needs-review`, `active` or `done` → skip silently.
+   - **Not offered while something blocks the split**, naming each item:
+     - any ⛔ item, or any questionnaire item ranked 🔴 Blocking, still in
+       the log;
+     - any open `[NEEDS CLARIFICATION: …]` marker in the PRD;
+     - an Open Question in any feature PRD naming one of this feature's
+       IDs together with an ID from another feature (a conflict deferred
+       by `/vc:requirements conflicts`);
+     - a section selected out in step 3, or skipped (⏭️) in step 4: the
+       whole PRD has to be read before the feature is ready.
+     Say the feature can be marked ready once the PO/BA has answered and
+     `vc-prd` has updated the PRD, by running this skill again.
+   - Otherwise ask via `AskUserQuestion` whether the feature is ready to
+     be split into stories ("Not yet" / "Mark ready").
+   - Mark ready → set `status: ready` in the PRD's frontmatter and touch
+     nothing else in it. Report the file changed and name the next step,
+     `/vc:create-user-stories <feature-slug>`. On an Azure DevOps
+     project, say the board is unchanged until `/vc:sync-to-tracker`
+     pushes the new state.
+   - Story readiness is no longer set here: `vc-create-user-stories`
+     offers it right after it writes the stories.
 
 ## Notes
 
 - `<prd-folder>` is the folder holding the resolved `prd.md`, whether
   it's still `artifacts/<slug>/` or already moved under an epic.
-- The skill never touches the tracker; it reads `.vc/config.toml`'s
-  `tracker` only for step 8's sync reminder. It's a pure
-  reading-comprehension and gap-finding step that
-  can run at any point after a PRD exists (before epic assignment, before
-  story writing, before task breakdown).
+- The skill never touches the tracker; the next `/vc:sync-to-tracker`
+  moves the Feature to `[ado].feature_ready_state` once the PRD says
+  `ready`. It's a reading-comprehension and gap-finding step that
+  can run at any point after a PRD exists, and it is the step that
+  makes a feature `ready` for story writing.
 - A ❌ Misread means the PRD is clear and the reader got it wrong — it's
   a learning moment, shown back plainly but without judgement, and never
   turned into a PO question.

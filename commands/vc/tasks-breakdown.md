@@ -1,5 +1,5 @@
 ---
-description: Turn a confirmed user story into an implementation task breakdown, or validate one
+description: Turn a `ready` user story into an implementation task breakdown, or validate one
 argument-hint: <ado-ticket-id | story-id | story-file | feature-id> | validate [story-id]
 ---
 

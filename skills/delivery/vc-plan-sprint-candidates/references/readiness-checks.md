@@ -6,7 +6,8 @@ and what it says about the ones that may not. Works on the JSON from
 
 ## The gate
 
-Only a **ready** story or bug can be a candidate. Nothing else gets in, however
+Only a **ready** story or bug can be a candidate, and a ready story only
+once it has a task breakdown (check 10). Nothing else gets in, however
 high it sits in the backlog.
 
 | Tracker | Ready means |
@@ -15,8 +16,9 @@ high it sits in the backlog.
 | `azure-devops` | Work item State equals `.vc/config.toml`'s `[ado].ready_state` (stories) or `[ado].bug_ready_state` (bugs), both chosen in `/vc:setup`. When it is empty (a process with no ready state, e.g. Agile), `status: ready` in the local file matched by `ado_id` decides instead |
 
 `ready` is set only by the user, at the readiness offer in
-`vc-prd-clarify` (step 8) or `vc-tasks-breakdown` (step 6 and validate
-mode). This skill never sets or clears it.
+`vc-create-user-stories` (step 10) or `vc-create-pbi` (step 7), right
+after the stories are written. A story is broken into tasks only once
+it is `ready`. This skill never sets or clears it.
 
 ## Checks on ready stories
 
@@ -36,10 +38,12 @@ out of the candidates, with the reason).
 | 7 | No open blocking questions | `## Open Questions` in the story's spec, 🔴 Blocking items in the feature's `clarification-questions.md` | blocked when the question is blocking, otherwise concern |
 | 8 | Spike states its question and timebox | `Type: spike` stories only | concern |
 | 9 | Requirements it implements are settled | the story's `- Implements:` IDs, looked up in the feature PRD's `## Requirements` and in every feature PRD's `## Open Questions` | blocked when an implemented ID still has an inline `[NEEDS CLARIFICATION: …]` marker, or an Open Question in any feature PRD names an implemented ID together with an ID from another feature (a conflict deferred by `/vc:requirements conflicts`); concern when an implemented ID is retired or superseded |
+| 10 | Has a task breakdown (stories only, not bugs) | the story's `breakdown` in the script output (`null` when `tasks/story-<n>-spec.md` doesn't exist) | blocked |
 
 Story points are never part of these checks. When a check reads a file
-that does not exist (no breakdown yet, no clarification file), the check
-passes; do not invent a concern.
+that does not exist (no clarification file, or no breakdown for check 6),
+the check passes; do not invent a concern. Check 10 is the one
+exception: a missing breakdown blocks.
 
 A blocked ready story or bug is not moved back to `new`. Say what blocks
 it and which skill clears it; the user decides.
@@ -70,12 +74,13 @@ it ready:
 
 | Missing | Next step |
 |---|---|
-| No task breakdown | `/vc:tasks-breakdown <story>` (offers mark-ready at the end) |
+| Not marked ready | `/vc:create-user-stories <feature>` offers mark-ready after it writes (or reviews) the stories |
+| Ready, no task breakdown | `/vc:tasks-breakdown <story>` |
 | Breakdown has open questions | answer them, then `/vc:tasks-breakdown validate <story>` |
 | An implemented requirement has a `[NEEDS CLARIFICATION]` marker | the PO answers it through `/vc:prd <feature>` |
 | An implemented requirement is in a deferred conflict | the PO resolves it with `/vc:requirements conflicts <feature>` |
 | An implemented requirement is retired or superseded | point the story at the replacement (`/vc:requirements check` names it) |
-| The feature's PRD has not been read and checked by the team | `/vc:prd-clarify <feature>` (offers mark-ready at the end) |
+| The feature isn't `ready`, so no stories can be agreed yet | `/vc:prd-clarify <feature>` (offers to mark the feature ready at the end) |
 | No or weak acceptance criteria | `/vc:create-user-stories` or edit the story, then one of the above |
 | Unknown status value | fix the story's `status` field |
 

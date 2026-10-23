@@ -1,6 +1,6 @@
 ---
 name: vc-plan-sprint-candidates
-description: Prepare sprint planning for the PO or SM - a draft sprint goal written as an outcome, candidate user stories and bugs (only `ready` ones, from local files or Azure DevOps) fitted to the SM's published capacity and the team's story throughput, and carryover listed for an explicit decision - written to artifacts/sprints/[sprint-slug]/candidates.md. A leading `settle` token records the scope the team agreed in planning by setting the stories' iteration path. Invoked as /vc:plan-sprint-candidates [settle] [sprint-slug].
+description: Prepare sprint planning for the PO or SM - a draft sprint goal written as an outcome, candidate user stories and bugs (only `ready` ones with a task breakdown, from local files or Azure DevOps) fitted to the SM's published capacity and the team's story throughput, and carryover listed for an explicit decision - written to artifacts/sprints/[sprint-slug]/candidates.md. A leading `settle` token records the scope the team agreed in planning by setting the stories' iteration path. Invoked as /vc:plan-sprint-candidates [settle] [sprint-slug].
 ---
 
 # Plan Sprint Candidates
@@ -17,7 +17,8 @@ this skill reads both and decides neither.
 
 ## Ground rules
 
-- **Only `ready` stories and bugs are candidates.** See
+- **Only `ready` stories and bugs are candidates, and a story also needs
+  a task breakdown** (`tasks/story-<n>-spec.md`). See
   `references/readiness-checks.md` for what ready means per tracker and
   the checks run on top of it.
 - **No capacity, no plan.** The SM publishes
@@ -134,7 +135,7 @@ this skill reads both and decides neither.
   is ready when the PO sets `status: ready` (a bug-triage skill will take
   this over).
 - This skill never sets or clears `ready`; that is the user's call at the
-  offers in `vc-prd-clarify` and `vc-tasks-breakdown`.
+  offers in `vc-create-user-stories` and `vc-create-pbi`.
 - Local sprints are the folders under `artifacts/sprints/` that hold a
   `capacity.md`; the sprint dates come from that file. On Azure DevOps
   they are the team's iterations, and `capacity.md` must sit at

@@ -15,7 +15,43 @@ in the backlog hierarchy.
 | `System.IterationPath` | `.vc/config.toml`'s `[ado].iteration_path` (optional) | Omit the field entirely if blank. This is the field the backlog hierarchy rules mean by "Feature carries the target Iteration/Release" — the epic sync never sets this field at all. |
 | `System.Tags` | **Not mapped.** | `[tags].story` is story-specific; no feature-level tag config exists yet. |
 | Parent link (`System.LinkTypes.Hierarchy-Reverse`) | The feature's `epic_id`, resolved to that epic's `ado_id` (synced earlier in the same run) | **Never** a configured default — see "Parent resolution" below. |
-| `System.State` | Set to `.vc/config.toml`'s `[ado].feature_closed_state` only when the `prd.md` says `status: delivered` and the work item isn't already in that state | The only State change a feature sync makes, confirmed by the user first. See the skill's step 4 "Delivered feature". Every other State is left alone. |
+| `System.State` | The `prd.md` `status`, mapped through `.vc/config.toml`'s `[ado]` Feature state keys | Moved only as "Feature State" below describes, confirmed by the user first. |
+
+## Feature State
+
+The target State comes from the PRD's `status`:
+
+| `status` | Target State | Rank |
+|---|---|---|
+| `needs-review` | never synced: no create, no update | - |
+| `draft` (legacy `synced`) | the Feature type's first state (`New`) | 0 |
+| `ready` | `feature_ready_state`; empty → the first state | 1 |
+| `active` | `feature_active_state` | 2 |
+| `done` (legacy `delivered`) | `feature_done_state` (legacy key `feature_closed_state`) | 3 |
+
+Read the Feature type's states and categories once per run, with the
+`workItemTypeStates` query `vc-setup` uses. The board's **current rank**
+comes from the work item's current State:
+
+- equal to a configured state → that state's rank (the first state is 0);
+- otherwise by category: `Proposed` → 0, `InProgress` → 2,
+  `Resolved` or `Completed` → 3;
+- `Removed` → no move at all; list it in the summary ("removed on the
+  board, `<status>` locally").
+
+Then:
+
+| Case | Action |
+|---|---|
+| Current State equals the target | nothing to do |
+| Target rank higher (forward) | collect the move; the run confirms all moves once |
+| Target rank 0, current rank 1, `status: draft` (a `ready` feature revised back to `draft`) | the one backward move: confirm it on its own, naming the revision ("revised after it was ready") |
+| Any other lower target (backward) | leave it; list it as "board is further along" |
+| Target key empty or missing | no move; missing → suggest `/vc:setup` |
+
+A new Feature is created in the type's first state, then moved like an
+existing one. Azure DevOps refuses a move (some processes block closing
+with open children) → report the error and leave the State.
 
 ## Title extraction
 

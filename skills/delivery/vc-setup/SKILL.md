@@ -28,15 +28,21 @@ skill reads this file, so run this one first.
      A config with no `[[team_members]]` (Azure DevOps) or a repo with no
      secret protection in `.claude/settings.json` → also offer those steps
      (`members` / `secure` mode do the same on their own). An Azure
-     DevOps config with no `feature_closed_state`, or a repo with no
-     `docs/glossary.md` → also offer the Feature closed state question
-     (step 2's state table) and the glossary (step 6).
+     DevOps config missing any of `feature_ready_state`,
+     `feature_active_state` or `feature_done_state`, or a repo with no
+     `docs/glossary.md` → also offer the Feature state questions (step
+     2's state table) and the glossary (step 6).
    - Setup before v1.11.1 wrote `submodule_root` under `[ado]` and
      `cloned` under `[repos.ado]` / `[repos.github]`, where no reader
      finds them. If the existing config has either, show the fix (move
      `submodule_root` to the top level, `cloned` into `[repos]`, values
      unchanged) and apply it once the user confirms, whatever option
      they pick above.
+   - Setup before the Feature state questions wrote
+     `feature_closed_state`. Readers take it as `feature_done_state`
+     until it is rewritten. If the existing config has it, show the fix
+     (rename it to `feature_done_state`, value unchanged) and apply it on
+     the same confirmation.
 
 2. **Choose the issue tracker**
    - Ask which tracker this project uses: Azure DevOps, GitHub, Linear, or
@@ -193,16 +199,20 @@ skill reads this file, so run this one first.
      entries (`name`, `id`) in step 6's config. Never store an email
      address, token, or anything beyond name and id.
    - **Choose the sprint states for stories and bugs, and the Feature
-     closed state.** Three skills move work items between states, and
+     states.** Three skills move work items between states, and
      process templates name them differently, so the user picks them once
-     here: `vc-sync-to-tracker` pushes `ready` (set by `vc-prd-clarify` /
-     `vc-tasks-breakdown`, or by hand for a bug) as the ready state,
+     here: `vc-sync-to-tracker` pushes `ready` (set by
+     `vc-create-user-stories` / `vc-create-pbi`, or by hand for a bug) as
+     the ready state,
      `vc-plan-sprint-candidates` only proposes items in it,
      `vc-implement` moves a story to the active state when work starts,
-     and `vc-sync-to-tracker` moves a feature whose PRD is `delivered`
-     to the Feature closed state.
-     - List the `Feature` type's states the same way, for the last
-       question below.
+     and `vc-sync-to-tracker` (plus `vc-implement` for `active`) moves a
+     Feature as its PRD `status` moves through `draft`, `ready`, `active`
+     and `done`.
+     - List the `Feature` type's states the same way, for the last three
+       questions below. A `draft` feature goes to the type's first state
+       (`New`), which is read from that list when needed, never stored or
+       asked; a `needs-review` stub is never synced.
      - Check the `Bug` type exists in the type list fetched above (the
        Basic process has none; it uses `Issue`). Present → store
        `bug_work_item_type = "Bug"`; absent → show the list and ask which
@@ -226,12 +236,16 @@ skill reads this file, so run this one first.
        | Which story state means "ready for a sprint"? | `ready_state` | a `Proposed` state after the first: `Ready`, Scrum's `Approved` | "No ready state" |
        | Which story state means "work has started"? | `active_state` | the first `InProgress` state: Agile's `Active`, Scrum's `Committed` | - |
        | Which bug state means "ready for a sprint"? | `bug_ready_state` | as for stories (Scrum bug: `Approved`) | "No ready state" |
-       | Which Feature state means "delivered"? | `feature_closed_state` | the first `Completed` state: Agile's `Closed`, Scrum's `Done` | - |
+       | Which Feature state means "ready to split into stories"? | `feature_ready_state` | a `Proposed` state after the first, when the process has one (no standard process does) | "No ready state" |
+       | Which Feature state means "being built"? | `feature_active_state` | the first `InProgress` state: Agile/CMMI `Active`, Scrum `In Progress` | - |
+       | Which Feature state means "done"? | `feature_done_state` | the first `Completed` state: Agile/CMMI `Closed`, Scrum `Done` | - |
 
      - "No ready state" (e.g. Agile's `User Story` and `Bug` go straight
-       from `New` to `Active`) → store `""` and tell the user: `ready` then
-       lives in the local files only, and a process admin can add a
-       custom `Ready` state (Proposed category) and re-run `/vc:setup`.
+       from `New` to `Active`, and no standard process has a Feature
+       `Ready`) → store `""` and tell the user: `ready` then lives in the
+       local files only (a ready feature stays in its first state on the
+       board), and a process admin can add a custom `Ready` state
+       (Proposed category) to that type and re-run `/vc:setup`.
      - Never pick a state for the user, even when only one fits.
 
 3. **Choose the submodule subfolder**
@@ -357,7 +371,9 @@ skill reads this file, so run this one first.
      active_state = "Active"
      bug_work_item_type = "Bug"
      bug_ready_state = ""
-     feature_closed_state = "Closed"
+     feature_ready_state = ""
+     feature_active_state = "Active"
+     feature_done_state = "Closed"
 
      [repos]
      source = "azure-devops"

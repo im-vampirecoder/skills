@@ -29,11 +29,11 @@ stories, test cases and later features can cite it.
    choice, a vague value, a word that should be a glossary term. One
    follow-up per vague answer, then `TBD` or a marker. Never re-ask what
    the PRD already says.
-5. **Delivered features** are frozen, so migration only restates what
+5. **`done` features** are frozen, so migration only restates what
    the PRD and the built stories already say. No gap interview, no new
    behaviour, no Open Questions added; gaps are listed in the console
-   instead. Leave `status` and `delivered` as they are (add
-   `delivered: null` only to a draft that lacks the field).
+   instead. Leave `status` and `done_on` (or legacy `delivered`) as
+   they are (add `done_on: null` only to a draft that lacks the field).
 6. **Keep the old Revision History** exactly as it is: not converted,
    not moved, not removed. From now on changes go through Revision Mode
    and `## Decisions`. Don't add other new sections unless a gap answer

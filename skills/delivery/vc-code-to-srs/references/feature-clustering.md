@@ -61,7 +61,7 @@ Read `artifacts/prd.md`'s Features section and every `prd.md` under
 `artifacts/epic-*/feature-<slug>/`). Match by meaning: read the PRD's
 Overview and Scope, don't compare slugs. A match sets `existing_prd` to
 that file and reuses its slug; the table shows its status
-(`needs-review`, `draft`, `delivered`).
+(`needs-review`, `draft`, `ready`, `active`, `done`).
 
 ## Slugs
 

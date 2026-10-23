@@ -62,9 +62,9 @@ Writes nothing and asks nothing.
    - `status: needs-review` → stop; point to `/vc:prd review`.
    - No `## Requirements` section → stop; point to `/vc:prd migrate
      <feature>`, since the map is tied to requirement IDs.
-   - `status: delivered` → the feature's map is read-only, like its PRD.
+   - `status: done` → the feature's map is read-only, like its PRD.
      Show the existing map's status if there is one and stop. A change to
-     a delivered feature's screens belongs to the superseding feature's
+     a `done` feature's screens belongs to the superseding feature's
      own map.
    - `<feature folder>/ux/user-flow.md` exists → run the check with
      `--prd`, then:

@@ -32,7 +32,8 @@ under whichever work item the "Bug Triage" > "Inbox" search resolves to
   IDs aren't in the markdown until we write them back).
 - **Sync never changes `status`.** A non-null `ado_id` is what marks an
   epic, feature or story as synced. `status` is the lifecycle field
-  (`needs-review` → `draft` → `delivered` for features) and belongs to
+  (`needs-review` → `draft` → `ready` → `active` → `done` for features;
+  the board follows it, never the other way round) and belongs to
   the skills that own that lifecycle. Before v1.11.1 this skill set
   `status: synced` on epics and features; when a file still has it,
   read it as `draft` and write `status: draft` back during this sync.
@@ -76,7 +77,9 @@ and store the project's actual type instead of assuming.
      Either way, pass the rest of `$ARGUMENTS` as the target to resolve
      there, instead of continuing with the steps that follow.
    - Take `$ARGUMENTS` as a feature slug, epic ID, or path under
-     `artifacts/epic-*/feature-*/`. It must already be epic-assigned and
+     `artifacts/epic-*/feature-*/`. A feature whose `prd.md` says
+     `status: needs-review` is never synced: stop and point to
+     `/vc:prd review`. It must already be epic-assigned and
      have stories under `epic-<epic-slug>/feature-<feature-slug>/`. Still
      at `artifacts/<feature-slug>/` (unassigned, possibly with stories
      already written) → tell the user to run `/vc:propose-epic` first.
@@ -148,21 +151,18 @@ and store the project's actual type instead of assuming.
      relation and add the correct one — see
      `references/feature-field-mapping.md`'s re-parenting section.
      Refresh `last_synced`.
-   - **Delivered feature** (the only Feature State this skill sets).
-     When the `prd.md` says `status: delivered` (set by
-     `/vc:prd deliver`) and `.vc/config.toml`'s
-     `[ado].feature_closed_state` is non-empty:
-     - Read the work item's current State the same way as a story's
-       "Ready state" below. Already `feature_closed_state` → nothing to
-       do.
-     - Otherwise collect the move (feature title, ADO id,
-       `<current> -> <feature_closed_state>`), confirm it with the user,
-       and only then send it with
-       `az boards work-item update --id <ado_id> --state "<feature_closed_state>"`.
-       Azure DevOps refuses the move while open children block it on
-       some processes → report the error and leave the State as it is.
-     - Key missing (config written before this existed) → skip and
-       suggest re-running `/vc:setup`, which asks for it.
+   - **Feature State.** Follows the PRD's `status` as
+     `references/feature-field-mapping.md`'s "Feature State" describes:
+     `draft` → the type's first state, `ready` →
+     `[ado].feature_ready_state`, `active` → `feature_active_state`,
+     `done` → `feature_done_state` (legacy `delivered` status and
+     `feature_closed_state` key are read as the new names). Forward
+     moves join the run's single confirmation with the stories' ready
+     moves (feature title, ADO id, `<current> -> <target>`). The one
+     backward move, `Ready -> New` after a `ready` feature was revised
+     back to `draft`, is confirmed on its own. Never send a move before
+     the user confirms; send with
+     `az boards work-item update --id <ado_id> --state "<target>"`.
 
 5. **Sync each story**
    - Parse the story file and build its Azure DevOps fields following
@@ -197,7 +197,7 @@ and store the project's actual type instead of assuming.
      the story no longer implements, keep every other tag). No
      re-parenting check here — see "Why this skill works the way it
      does" for why a story's parent never drifts. Refresh `last_synced`.
-   - **Ready state** (the only State this skill ever sets). After the
+   - **Ready state** (the only State this skill sets on a story). After the
      create or update, when the story file says `status: ready` and
      `.vc/config.toml`'s `[ado].ready_state` is non-empty:
      - Read the work item's current State
@@ -210,8 +210,8 @@ and store the project's actual type instead of assuming.
        has started, finished, or removed it) → leave it and list it in
        the summary as "marked ready locally, board is further along".
      - Collect these moves for the whole run and confirm them once with
-       the user (story title, ADO id, `New -> <ready_state>`) before
-       sending any. Send with
+       the user, together with the feature's forward move from step 4
+       (story title, ADO id, `New -> <ready_state>`), before sending any. Send with
        `az boards work-item update --id <ado_id> --state "<ready_state>"`.
      - `ready_state` key missing (config written before this existed) →
        skip the move and suggest re-running `/vc:setup`. Empty → skip
@@ -244,7 +244,7 @@ and store the project's actual type instead of assuming.
 
 7. **Report the summary**
    - Print a plain count: epic created/updated, feature created/updated
-     (and closed, when delivered), stories created/updated, requirement
+     (and its State move, if any), stories created/updated, requirement
      ID tags added/removed, tasks created/updated, tasks excluded for
      being marked `Skipped`, any stories skipped for having no task
      breakdown yet, and any feature re-parenting that happened. No
@@ -348,10 +348,10 @@ resolves this).
 - Never change a work item's **State**, with two exceptions, both
   confirmed by the user: a story's move from its starting state to
   `[ado].ready_state` (or a bug's to `[ado].bug_ready_state`), as the
-  "Ready state" steps describe, and a delivered feature's move to
-  `[ado].feature_closed_state` (step 4's "Delivered feature"). State transitions trigger
-  board automations and may notify other people; no other State change
-  is in this skill's model.
+  "Ready state" steps describe, and a Feature's move to the State its
+  PRD `status` maps to (step 4's "Feature State"). State transitions
+  trigger board automations and may notify other people; no other State
+  change is in this skill's model.
 - Never delete a work item. If a story or bug file is removed from the
   vc workspace, leave the Azure DevOps item alone and flag it to the
   user.

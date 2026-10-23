@@ -32,8 +32,8 @@ feature folder, and a `needs-review` stub PRD that points at it, so
   items as dangling requirements.
 - **Self-contained output.** Pack files never name this skill, a tool, a
   vendor, or how they were produced.
-- **Never edits** application code, a `draft` or `delivered` PRD,
-  stories, or the tracker.
+- **Never edits** application code, a `draft`, `ready`, `active` or
+  `done` PRD, stories, or the tracker.
 - **Scripts.** `<skill-dir>` is this skill's folder; run from the
   tracking repo root:
   `python3 <skill-dir>/scripts/as_built_plan.py <command>` (manifest:

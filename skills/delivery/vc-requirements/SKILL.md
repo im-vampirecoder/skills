@@ -87,7 +87,7 @@ is kept.
 Read `references/conflict-check.md` before running this mode. In short:
 
 1. **Shortlist (script).** `python3 <skill-dir>/scripts/shortlist_conflict_candidates.py --root . [--feature <slug>]`
-   returns candidate pairs, delivered-vs-delivered `bug_candidates`, and
+   returns candidate pairs, done-vs-done `bug_candidates`, and
    on an unscoped run over 50 pairs, `needs_scope: true` with per-feature
    counts. Then ask which features to audit and rerun scoped. Never cap
    and continue.
@@ -105,7 +105,7 @@ Read `references/conflict-check.md` before running this mode. In short:
    `check` and `view`.
 4. **Report.** One console summary: found, resolved, deferred (now Open
    Questions), dismissed (now `not a conflict` Decisions entries), and
-   delivered-vs-delivered pairs listed as `/vc:bug-report` candidates.
+   done-vs-done pairs listed as `/vc:bug-report` candidates.
    No report file.
 
 ## Called by

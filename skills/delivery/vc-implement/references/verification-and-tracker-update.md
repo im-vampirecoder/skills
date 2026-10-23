@@ -15,6 +15,13 @@ leave it and tell the user the file says the item is already closed.
 The local status is what `vc-plan-sprint-candidates` reads for the
 sprint board and throughput, for bugs as much as for stories.
 
+**Feature file** (stories only): when the story's feature `prd.md` says
+`status: ready`, set it to `status: active` (the first story of the
+feature to start) and touch nothing else in the PRD. Any other feature
+status → leave it: `active` or `done` already, `draft` or `needs-review`
+when a spike runs before the feature is agreed. Report it with the
+story's change.
+
 **Azure DevOps** (stories only, and only when the story has a non-null
 `ado_id`; a bug's work item state is left alone at start):
 
@@ -30,6 +37,25 @@ sprint board and throughput, for bugs as much as for stories.
 - `az boards work-item update --id <ado_id> --state "<active_state>"`.
 - A story that was never marked ready is still moved, but say so: the
   team pulled it into work without the readiness offer.
+
+**Azure DevOps Feature** (stories only): when the feature's `prd.md`
+says `status: active` after the feature-file step above, and the PRD
+has a non-null `ado_id`:
+
+- Target state: `[ado].feature_active_state`. Key missing or empty →
+  skip, and suggest re-running `/vc:setup`; the next
+  `/vc:sync-to-tracker` moves it once the key exists.
+- Read the Feature's current State the same way as the story's. Move it
+  only when it is still in a `Proposed`-category state (`New`, or
+  `[ado].feature_ready_state`). Already `feature_active_state` → nothing
+  to do. Any later state (resolved, closed, removed) → leave it and tell
+  the user.
+- `az boards work-item update --id <prd ado_id> --state "<feature_active_state>"`.
+- This move is part of step 1's confirmation: name it there (feature
+  title, ADO id, `<current> -> <feature_active_state>`) alongside the
+  story's, and send nothing the user didn't confirm.
+- No `ado_id` on the PRD (feature not synced yet) → the local `active`
+  is enough; `/vc:sync-to-tracker` creates the Feature and moves it.
 
 Report the change (work item id, old→new state) with the rest of the
 run's record.
@@ -89,17 +115,17 @@ tasks. Don't do it automatically — a story can have tasks this run didn't
 touch (a partial implementation across multiple runs), and only the user
 knows whether the story as a whole is actually finished.
 
-**Feature delivery offer:** after a story is set `done`, check the
+**Feature done offer:** after a story is set `done`, check the
 other `stories-*.md` files in the same feature folder. Every one `done`
-or `removed`, and the feature's `prd.md` not already `status: delivered`
+or `removed`, and the feature's `prd.md` not already `status: done`
 → tell the user this was the feature's last story and ask whether the PO
-confirms the feature is delivered. Yes → invoke `/vc:prd deliver
+confirms the feature is `done`. Yes → invoke `/vc:prd done
 <feature>` through the Skill tool; it freezes the requirements, writes
 supersession banners and asks its own confirmation. No, or the PO isn't
-here → say the PO can run `/vc:prd deliver <feature>` later. Never set
-`delivered` yourself, and never move the ADO Feature's State:
-`vc-sync-to-tracker` closes it on its next run once the PRD says
-`delivered`.
+here → say the PO can run `/vc:prd done <feature>` later. Never set
+`done` yourself, and never move the ADO Feature's State to done:
+`vc-sync-to-tracker` moves it to `[ado].feature_done_state` on its next
+run once the PRD says `done`.
 
 **Bug:** once its fix is verified, ask whether the bug is finished. On a
 yes, set `status: done` in the bug file's frontmatter (same reason as

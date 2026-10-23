@@ -1,8 +1,8 @@
 ---
 id: FEATURE-accounts
 epic_id: EPIC-identity
-status: delivered
-delivered: 2026-09-30
+status: done
+done_on: 2026-09-30
 ---
 
 # Feature PRD: Accounts

@@ -91,7 +91,7 @@ endpoint") is still never written as its own item here — that's
      [action], so that [benefit]."
    - Note which live requirement IDs each value story implements (its
      FRs plus the BRs, ERRs and NFRs that apply to them), as
-     `vc-create-user-stories` step 2 does. A spike or enabler builds no
+     `vc-create-user-stories` step 4 does. A spike or enabler builds no
      requirement itself, so it implements none unless it delivers part
      of one.
 
@@ -196,10 +196,15 @@ endpoint") is still never written as its own item here — that's
      this id and by the `stories-<n>-*.md` filename, so a different
      scheme would make a non-demoable item invisible to both.
    - Same `status: new` / `iteration: null` sprint-tracking fields as
-     `vc-create-user-stories` (see its step 6 for the values and who
-     changes them). A spike needs to be `ready` before a sprint too.
+     `vc-create-user-stories` (see its step 9 for the values and who
+     changes them). A spike needs to be `ready` before task breakdown
+     and a sprint too.
 
-7. **Summarize**
+7. **Offer to mark items ready, then summarize**
+   - First the readiness offer, exactly as `vc-create-user-stories`
+     step 10: the feature's `status: new` items, multi-select, "None yet"
+     included; set `status: ready` on the chosen ones and nothing else.
+     `/vc:tasks-breakdown` only runs on `ready` items.
    - After writing all files, list them with a one-line description each
      (tagging `[spike]` next to any non-demoable item), the suggested
      implementation order, and which items form the MVP subset (deliver
@@ -207,7 +212,7 @@ endpoint") is still never written as its own item here — that's
    - List any Task-level dependency flagged in step 3 (technical
      prerequisites with no item of their own), naming which item each one
      belongs under.
-   - Same coverage warning as `vc-create-user-stories` step 7: every
+   - Same coverage warning as `vc-create-user-stories` step 11: every
      live P0 `FR-` that no item in the feature folder implements is named,
      with an offer to draft one. A spike never counts as covering an FR.
    - Suggest `/vc:requirements check` so the new `Implements:`

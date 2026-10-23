@@ -100,7 +100,7 @@ straight to `/vc:create-user-stories` without running this at all.
      holding `TBD` is an open point to raise, never a number to assume.
      Read the PRD's `## Decisions` and, when present,
      `## Changes to delivered features`: settled product choices this
-     design must respect, and the delivered requirements this feature
+     design must respect, and the `done` features' requirements this feature
      replaces.
    - Use each PRD's Touchpoints and Constraints sections as the first
      hint for which submodules are in play.

@@ -34,9 +34,9 @@ drafts. Signals:
 
 The script skips pairs already settled: any `## Decisions` line in either
 PRD that names both IDs, including `not a conflict: <id> vs <id>`.
-Delivered-vs-delivered pairs are returned as `bug_candidates` and never
+Done-vs-done pairs are returned as `bug_candidates` and never
 judged, because a contradiction between two shipped features is a product
-bug. Pairs involving a delivered feature come after draft-vs-draft pairs.
+bug. Pairs involving a `done` feature come after draft-vs-draft pairs.
 
 An unscoped run with more than 50 pairs returns `needs_scope: true`, the
 pair count and per-feature counts instead of pairs. Show those counts
@@ -82,9 +82,9 @@ the skill never picks.
 
 Each chosen option goes to `vc-prd` Revision Mode for the affected
 draft feature, together with the exact change, the Decisions line and the
-PO's role. A delivered feature is never edited. The change always lands
+PO's role. A `done` feature is never edited. The change always lands
 in the draft or new feature (for example, the new feature supersedes the
-delivered ID).
+`done` feature's ID).
 
 ## Output
 

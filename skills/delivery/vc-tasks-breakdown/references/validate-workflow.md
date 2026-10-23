@@ -117,8 +117,5 @@ steps, don't guess.
 - Number of questions asked, key decisions
 - Files changed
 - Recommendation: ready to sync/implement, or revise first
-- Readiness offer: when the recommendation is ready, no Open Questions
-  remain in `story-<n>-spec.md`, and the story's `status` is `new` (missing counts
-  as `new`), ask whether to mark the story ready to be put into a sprint
-  - same question and same single-line `status: ready` edit as the main
-  workflow's step 6.
+- No readiness offer: the story was already `ready` before its breakdown
+  existed (SKILL.md step 1), and this mode never changes its `status`.

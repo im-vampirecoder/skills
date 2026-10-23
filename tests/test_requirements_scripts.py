@@ -17,6 +17,8 @@ FIXTURE = HERE / "fixtures" / "requirements-repo"
 sys.path.insert(0, str(SCRIPTS))
 
 import check_requirement_ids  # noqa: E402
+import parse_requirement_ids  # noqa: E402
+import requirement_state  # noqa: E402
 import shortlist_conflict_candidates  # noqa: E402
 
 
@@ -90,9 +92,17 @@ class RequirementScriptsTest(unittest.TestCase):
         self.assertIn(frozenset(("NFR-checkout.payment-response-time", "NFR-card-wallet.payment-response-time")), keys)
         self.assertNotIn(frozenset(("FR-checkout.show-receipt", "FR-card-wallet.show-receipt")), keys)
         for p in pairs["pairs"]:
-            self.assertFalse(p["a_status"] == p["b_status"] == "delivered")
+            self.assertFalse(p["a_status"] == p["b_status"] == "done")
         bugs = {frozenset((p["a"], p["b"])) for p in pairs["bug_candidates"]}
         self.assertIn(frozenset(("BR-loyalty.guest-points", "BR-accounts.login-before-purchase")), bugs)
+
+    def test_done_and_legacy_delivered_both_read_as_done(self):
+        features = {f["slug"]: f for f in parse_requirement_ids.load_project(self.root)["features"]}
+        self.assertEqual(features["accounts"]["status"], "done")
+        self.assertEqual(features["loyalty"]["status"], "done")
+        for slug in ("accounts", "loyalty"):
+            definition = features[slug]["definitions"][0]
+            self.assertEqual(requirement_state.frozen_reason(features[slug], definition), "feature done")
 
     def test_shortlist_scoped_to_one_feature(self):
         pairs = shortlist_conflict_candidates.shortlist(self.root, feature="card-wallet")

@@ -1,6 +1,6 @@
 ---
 name: vc-prd
-description: Interview the user about a feature and write its PRD with named requirement IDs (FR / NFR / BR / ERR), bootstrapping the whole-product PRD on first use. Interview depth adapts to the feature (Quick / Targeted / Deep, `--deep` forces Deep). Revises a draft feature in place; refuses to edit a delivered one and offers a superseding feature instead. Leading tokens in $ARGUMENTS pick other modes - `review` completes a needs-review stub, `deliver <feature>` freezes a finished feature, `clarify <id>` adds a clarification line to a requirement, `migrate [feature]` adds named IDs to older PRDs. Triggered by /vc:prd. Built-in only - never delegates to a third-party interview skill.
+description: Interview the user about a feature and write its PRD with named requirement IDs (FR / NFR / BR / ERR), bootstrapping the whole-product PRD on first use. Interview depth adapts to the feature (Quick / Targeted / Deep, `--deep` forces Deep). Revises a draft feature in place; refuses to edit a `done` one and offers a superseding feature instead. Leading tokens in $ARGUMENTS pick other modes - `review` completes a needs-review stub, `done <feature>` freezes a finished feature (`deliver` is its old name), `clarify <id>` adds a clarification line to a requirement, `migrate [feature]` adds named IDs to older PRDs. Triggered by /vc:prd. Built-in only - never delegates to a third-party interview skill.
 ---
 
 # PRD
@@ -29,15 +29,16 @@ runs the one-sentence test explicitly before anything gets written.
 | `references/interview-depth.md` | before any interview: depth, "already have / still missing", vague answers, exact values, playback, anti-goals |
 | `references/requirements-section.md` | writing or revising a feature PRD: template, ID rules, line formats, wording, errors, markers, conditional tables |
 | `references/fresh-reader-check.md` | step 8, after the self-check (Targeted and Deep) |
-| `references/supersession.md` | Revision Mode, superseding a delivered feature, the built-requirement freeze, `## Decisions`, product history |
-| `references/deliver-mode.md` | `deliver` and `clarify` |
+| `references/supersession.md` | Revision Mode, superseding a `done` feature, the built-requirement freeze, `## Decisions`, product history |
+| `references/done-mode.md` | `done` (old name `deliver`) and `clarify` |
 | `references/migrate-mode.md` | `migrate` |
 
 ## Workflow
 
 0. **Resolve the mode**
    - First token of `$ARGUMENTS`: `review [feature]` → **Review Mode**;
-     `deliver <feature>` or `clarify <id>` → `references/deliver-mode.md`;
+     `done <feature>` (or its old name `deliver <feature>`) or
+     `clarify <id>` → `references/done-mode.md`;
      `migrate [feature]` → `references/migrate-mode.md`. No mode token →
      step 1. `--deep` anywhere forces Deep interview depth.
    - A request from `/vc:requirements conflicts` carrying a chosen
@@ -214,8 +215,10 @@ runs the one-sentence test explicitly before anything gets written.
    - **Write** `artifacts/<feature-slug>/prd.md` from the approved draft
      with `status: draft`, plus only the glossary rows the user approved,
      then delete `prd.draft.md`. `epic_id`, `ado_id` and `last_synced`
-     start `null` and are never this skill's to fill in later.
-   - **After every write** (here, Revision Mode, Review Mode, `deliver`,
+     start `null` and are never this skill's to fill in later. Say the
+     next step: `/vc:prd-clarify <feature-slug>`, where the team reads
+     it and marks it `ready`; stories are written only after that.
+   - **After every write** (here, Revision Mode, Review Mode, `done`,
      `clarify`, `migrate`), invoke `/vc:requirements check`, then
      `/vc:requirements view`, through the Skill tool. Fix errors it
      reports in the PRD just written and run `check` again; report
@@ -244,11 +247,18 @@ handed in. Load `references/supersession.md` and
    `stories-*.md` in the folder (status and `Implements:`).
 2. **Act on the state:**
    - `needs-review` → Review Mode instead.
-   - `delivered` → refuse the edit and say why. Offer `clarify <id>`
-     when the meaning doesn't change, otherwise a new feature that
-     supersedes the affected IDs: run steps 4-9 with `supersedes` and
+   - `done` (or legacy `delivered`) → refuse the edit and say why.
+     Offer `clarify <id>` when the meaning doesn't change, otherwise a
+     new feature that supersedes the affected IDs: run steps 4-9 with `supersedes` and
      `## Changes to delivered features` filled in.
    - `draft` (or legacy `synced`, treated as draft) → continue.
+   - `ready` → continue as for draft, but the write in step 8 sets
+     `status: draft`, and the write preview lists the stories citing a
+     changed, retired or replaced ID ("Revision Mode by state" in
+     `references/supersession.md`).
+   - `active` → continue as for draft; the status stays `active`. The
+     write preview lists the not-done stories citing a changed, retired
+     or replaced ID, so the team can re-check work in progress.
 3. **Interview** what is changing, using step 5's rules at a depth that
    fits the size of the change. A handed-in resolution skips this: apply
    the exact change it names.
@@ -272,7 +282,9 @@ handed in. Load `references/supersession.md` and
    (when the depth calls for it), conflict pass, write preview, write,
    `check` and `view`. Body sections always describe what is true now,
    never a diff. Frontmatter stays as is, except legacy `synced` →
-   `draft`.
+   `draft` and `ready` → `draft`. After a `ready` → `draft` write, say
+   the feature needs `/vc:prd-clarify <feature-slug>` again before more
+   stories are written from it.
 9. **Step 9's product-level question**, logging confirmed product
    changes to `artifacts/prd-history.md`.
 10. **Architecture nudge.** Name the narrowest re-run that covers the
@@ -315,7 +327,7 @@ steps 5, 6, 8 and 9.
   `artifacts/<feature-slug>/prd.md` (new feature), an existing feature's
   `prd.md` wherever it lives (edited in place, never moved), the
   temporary `prd.draft.md` beside it, approved `docs/glossary.md` rows,
-  and, through `apply_supersessions.py` on `deliver`, banners and
+  and, through `apply_supersessions.py` on `done`, banners and
   `superseded` lists in older PRDs. Moving a feature under an epic is
   `vc-propose-epic`'s job.
 - The one-sentence test runs here, not in `vc-propose-epic`, because
@@ -323,5 +335,5 @@ steps 5, 6, 8 and 9.
 - Reads only `submodule_root` from `.vc/config.toml`; never writes it.
   Scouting is best-effort and silent; a product with no code is normal.
 - Only `vc-docs features` and `vc-code-to-srs` write `needs-review`;
-  only `deliver` writes `delivered`. This skill is the only writer of feature PRDs;
+  only `done` writes `done`. This skill is the only writer of feature PRDs;
   `vc-requirements` finds problems and hands resolutions here.

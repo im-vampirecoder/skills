@@ -1,20 +1,37 @@
 # Feature states, the built-requirement freeze, supersession and Decisions
 
-Load this in Revision Mode, when a new feature replaces delivered
-requirements, and when applying a conflict resolution.
+Load this in Revision Mode, when a new feature replaces requirements of a
+`done` feature, and when applying a conflict resolution.
 
 ## Feature states
 
 | `status` | Who sets it | What can change |
 |---|---|---|
 | `needs-review` | `vc-docs features` | everything; completed through Review Mode |
-| `draft` | this skill (new feature, Review Mode) | edited in place, no change log, subject to the freeze below |
-| `delivered` | `/vc:prd deliver` | nothing in the body except `> Superseded by` and `> Clarified on` lines; frontmatter only through `deliver` and `apply_supersessions.py` |
+| `draft` | this skill (new feature, Review Mode, and any revision of a `ready` feature) | edited in place, no change log, subject to the freeze below |
+| `ready` | `vc-prd-clarify` (step 8), once the team has read it and nothing blocks it | same as draft, but any revision sets it back to `draft` (Revision Mode below); stories are written only for a `ready` or `active` feature |
+| `active` | `vc-implement`, when the first story of a `ready` feature starts | same as draft (the freeze protects what is built); a revision keeps it `active` |
+| `done` (legacy `delivered`, read as `done`) | `/vc:prd done` | nothing in the body except `> Superseded by` and `> Clarified on` lines; frontmatter only through `done` and `apply_supersessions.py` |
 
 A legacy `status: synced` (written by sync before v1.11.1) means draft.
 Rewrite it to `draft` the next time the PRD is written.
 
 ## Revision Mode by state
+
+**Ready.** Revise it exactly like a draft, then set `status: draft`:
+the team has to re-read what changed before more stories are written
+from it. Before writing, list the stories (any status but `removed`)
+whose `Implements:` cites an ID this revision changes, retires or
+replaces, with their status, so the PO can re-check them. Stories keep
+their own status; this skill never edits a story file. Name
+`/vc:prd-clarify <feature-slug>` as the way back to `ready`.
+
+**Active.** Revise it exactly like a draft and keep `status: active`:
+stories are being built, and the built-requirement freeze below already
+protects what is `done`. Before writing, list the stories that are not
+`done` or `removed` whose `Implements:` cites an ID this revision
+changes, retires or replaces, with their status, so the team can
+re-check work in progress. This skill never edits a story file.
 
 **Draft.** Edit the body in place so it describes what is true now.
 There is no change log: what changed is in git, and why is in
@@ -23,12 +40,12 @@ touched follows the "When an ID can change" table in
 `requirements-section.md`, and built requirements follow the freeze
 below.
 
-**Delivered.** Refuse the edit and say why: the feature is frozen
+**Done.** Refuse the edit and say why: the feature is frozen
 because it describes what was shipped, and stories, test cases and the
 tracker point at it. Then offer the route that fits:
 
 - the requirement was unclear, not wrong, and the built system's
-  behaviour doesn't change → `/vc:prd clarify <id>` (`deliver-mode.md`);
+  behaviour doesn't change → `/vc:prd clarify <id>` (`done-mode.md`);
 - anything else → a new feature that supersedes the affected IDs. Run
   the normal new-feature flow (SKILL.md step 4 onward) with the change as
   its description, `supersedes` filled in and a
@@ -78,7 +95,7 @@ A change to a frozen requirement:
 A small fix that leaves the built behaviour the same (clearer wording, a
 missing detail) is a `> Clarified on` line, not a new ID.
 
-## Superseding a delivered feature
+## Superseding a `done` feature
 
 The new feature's frontmatter lists every target, as a single-line list:
 
@@ -86,7 +103,7 @@ The new feature's frontmatter lists every target, as a single-line list:
 supersedes: [FR-checkout.pay-with-stripe, ERR-checkout.card-declined]
 ```
 
-To replace a whole delivered feature, use its feature ID:
+To replace a whole `done` feature, use its feature ID:
 `supersedes: [FEATURE-checkout]`.
 
 The new PRD then gets a `## Changes to delivered features` section, one
@@ -104,15 +121,15 @@ bullet per target, in exactly one of these forms:
 a target with no replacement is marked as superseded by the new feature
 itself.
 
-Only delivered requirements are superseded. A conflict with a draft
+Only requirements of `done` features are superseded. A conflict with a draft
 feature is settled by changing or retiring requirements in the drafts
 (Decisions entry in both), and a change to a built requirement in a
 draft feature follows the freeze above.
 
-Supersession takes effect when the new feature is delivered. Until then
+Supersession takes effect when the new feature is `done`. Until then
 the old ID is still the current truth, and `requirements-current.md`
-shows it as "being replaced by FEATURE-<new> (draft)". On delivery,
-`deliver` runs the script, which adds `> Superseded by <id> on <date>`
+shows it as "being replaced by FEATURE-<new> (draft)". At `done`, the
+`done` mode runs the script, which adds `> Superseded by <id> on <date>`
 under each target and the target to the old PRD's `superseded: [...]`.
 Never write those lines by hand.
 
@@ -150,5 +167,5 @@ or Product Goals are logged in `artifacts/prd-history.md`, never inside
 ```
 
 New entries go directly under the heading. Adding a feature link to
-`## Features`, or the ` (delivered)` / ` (needs review)` suffixes, isn't
+`## Features`, or the ` (done)` / ` (needs review)` suffixes, isn't
 logged. Never edit or delete an older entry.
